@@ -1,11 +1,11 @@
 # decktech
 
 
-**Team Name: DeckTech
-****Team ID: 6509
-**
-**Proposed Level of Achievement: Apollo 11
-**
+**Team Name: DeckTech**
+**Team ID: 6509**
+
+**Proposed Level of Achievement: Apollo 11**
+
 **Motivation** 
 
 The motivation behind our project stems from the desire to revolutionize the mobile poker gaming experience. With the widespread popularity of poker games on mobile platforms, there is a growing demand for innovative solutions that cater to both casual players and enthusiasts. Our motivation stems from a shared interest in poker and technology. We are intrigued by the idea of merging the intricate dynamics of poker with the possibilities offered by Software Engineering, ultimately aiming to deliver an app that not only entertains but also educates and challenges players of all skill levels. 
@@ -15,8 +15,8 @@ The motivation behind our project stems from the desire to revolutionize the mob
 We hope to develop a poker mobile application with a wide range of features and functionalities to create a unique and engaging experience for players. By combining standard poker gameplay features with innovative additions such as a ‘Spectator Mode’ and singeplayer mode against computer opponents, we aim to create a platform that caters to both casual players and those seeking to improve their skills and strategy. Additionally, we aim to learn and apply SWE tools and techniques to train computer bots that mimic human gameplay behaviour and strategies, providing users with challenging and realistic opponents. By leveraging innovative technologies and creative design, we aim to create a poker mobile app that stands out in a crowded market and leaves a lasting impression on users.
 
 
-**User Stories
-**
+**User Stories**
+
 - As a casual poker player, I want to enjoy quick and easy access to poker games on my mobile device, with options for both solo and multiplayer gameplay.
 - As a competitive player, I want to test my skills against bot opponents of varying difficulty levels and receive feedback and guidance to improve my game.
 - As a spectator, I want to observe ongoing poker games and analyze players’ hands and betting patterns, enhancing my understanding of the game and improving my own gameplay.
