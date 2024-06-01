@@ -1,5 +1,6 @@
 // import 'package:auth/auth.dart';
 import 'package:decktech/components/my_textfield.dart';
+import 'package:decktech/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import '../components/my_button.dart';
 import '../components/square_tile.dart';
@@ -78,7 +79,9 @@ class LoginScreen extends StatelessWidget {
              const SizedBox(height: 20),
 
              MyButton(
-              onTap: signUserIn,
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+              },
              ),
 
              const SizedBox(height: 45),
