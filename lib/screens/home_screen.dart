@@ -1,6 +1,5 @@
-import 'package:decktech/screens/login_screen.dart';
 import 'package:flutter/material.dart';
-import '../components/back_button.dart'
+
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -8,21 +7,30 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
+      backgroundColor: Color.fromARGB(255, 130, 37, 37),
       body: SafeArea(
         child: Center(
           child: Column(
             children: [
-              const Text("LOGGED IN"),
+              SizedBox(height: 50),
 
-              const SizedBox(
+              Text(
+                "LOGGED IN",
+                style: TextStyle(
+                  color: Color.fromARGB(255, 208, 135, 135),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold)
+              ),
+
+              SizedBox(
                 height: 30,
               ),
 
-              BackButton(
-                onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()))
-                },
-              )
+              
+
+              BackButton(),
+
+              
             ],
 
           )

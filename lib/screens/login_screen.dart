@@ -1,6 +1,6 @@
 // import 'package:auth/auth.dart';
 import 'package:decktech/components/my_textfield.dart';
-import 'package:decktech/screens/home_screen.dart';
+import 'package:decktech/screens/routes.dart';
 import 'package:flutter/material.dart';
 import '../components/my_button.dart';
 import '../components/square_tile.dart';
@@ -80,7 +80,8 @@ class LoginScreen extends StatelessWidget {
 
              MyButton(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+                // Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+                Navigator.pushNamed(context, AppRoutes.landscape);
               },
              ),
 
