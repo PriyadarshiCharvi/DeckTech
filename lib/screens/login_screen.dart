@@ -19,12 +19,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final FirebaseAuthImplementation _auth = FirebaseAuthImplementation();
 
-  TextEditingController _usernameController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -58,20 +58,12 @@ class _LoginScreenState extends State<LoginScreen> {
              const SizedBox(height: 25),
 
              MyTextfield(
-              controller: _usernameController,
-              hintText: 'Username',
-              obscureText: false,
-             ),
-
-             const SizedBox(height: 10),
-
-             /* MyTextfield(
-              controller: emailController,
+              controller: _emailController,
               hintText: 'Email',
               obscureText: false,
              ),
 
-             const SizedBox(height: 10), */
+             const SizedBox(height: 10),
 
              MyTextfield(
               controller: _passwordController,
@@ -100,7 +92,6 @@ class _LoginScreenState extends State<LoginScreen> {
               onTap: () {
                 _login();
                 // Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-                Navigator.pushNamed(context, AppRoutes.landscape);
               },
              ),
 
@@ -195,20 +186,21 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _login() async {
-    String username = _usernameController.text;
+    String email = _emailController.text;
     String password = _passwordController.text;
 
-    User? user = await _auth.signInWithEmailAndPassword(username, password);
+    User? user = await _auth.signInWithEmailAndPassword(email, password);
 
     if (user != null) {
       if (kDebugMode) {
         print("User is successfully logged in");
       }
-      Navigator.pushNamed(context, "/portrait");
+      Navigator.pushNamed(context, AppRoutes.landscape);
     } else {
       if (kDebugMode) {
-        print("Some error occurred");
+        print("Wrong email/password");
       }
+      Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
     }
   }
 }
