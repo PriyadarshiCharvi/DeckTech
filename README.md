@@ -42,10 +42,9 @@ We hope to develop a poker mobile application with a wide range of features and 
 - Brainstorm, refine and finalize the features of the application, including standard poker gameplay, spectator mode, computer opponents, and multiplayer support.
 - Research and identify suitable technologies for mobile app development, integration, and backend services.
 - Create a development plan outlining milestones, tasks, and responsibilities
-- Develop a detailed system design, including user interface wireframes and backend architecture.
 - Learn the required technologies, focusing on mobile app development frameworks (Flutter), communication servers (WebSockets), and backend services (Firebase).
 - Set up a minimal system, including an integrated frontend and backend with basic login functionality
-- 
+  
 **Milestone 2** - Prototype (i.e., a working system with the core features)
 - Design and implement the core features of the mobile poker application, including standard gameplay modes.
 - Develop the user interface for the spectator mode, incorporating real-time statistics and hand analysis.
