@@ -1,3 +1,4 @@
+import 'package:decktech/screens/routes.dart';
 import 'package:flutter/material.dart';
 
 
@@ -6,15 +7,15 @@ class ExitScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color.fromARGB(255, 130, 37, 37),
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 130, 37, 37),
       body: SafeArea(
         child: Center(
           child: Column(
             children: [
-              SizedBox(height: 50),
+              const SizedBox(height: 50),
 
-              Text(
+              const Text(
                 "LOGGED OUT",
                 style: TextStyle(
                   color: Color.fromARGB(255, 208, 135, 135),
@@ -22,13 +23,23 @@ class ExitScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold)
               ),
 
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
 
-              
-
-              BackButton(),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.portrait);
+                  },
+                  child: Container(
+                    color: const Color.fromARGB(255, 158, 110, 110),
+                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    child: const Text(
+                      'Back to Login',
+                      style: TextStyle(color: Colors.white, fontSize: 13.0),
+                    ),
+                  ),
+                ),
 
               
             ],

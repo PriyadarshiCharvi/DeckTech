@@ -1,13 +1,12 @@
 // import 'package:auth/auth.dart';
 import 'package:decktech/components/my_textfield.dart';
-import 'package:decktech/screens/register_screen.dart';
+import 'package:decktech/components/signup_button.dart';
 import 'package:decktech/screens/routes.dart';
 import 'package:flutter/material.dart';
-import '../components/my_button.dart';
 import '../components/square_tile.dart';
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
+class RegisterScreen extends StatelessWidget {
+  RegisterScreen({super.key});
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -39,10 +38,10 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               const Text(
-                'DeckTech',
+                'Register',
                 style: TextStyle(
                   color: Color.fromARGB(255, 208, 135, 135),
-                  fontSize: 30,
+                  fontSize: 25,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -57,13 +56,13 @@ class LoginScreen extends StatelessWidget {
 
              const SizedBox(height: 10),
 
-             /* MyTextfield(
+              MyTextfield(
               controller: emailController,
               hintText: 'Email',
               obscureText: false,
              ),
 
-             const SizedBox(height: 10), */
+             const SizedBox(height: 10),
 
              MyTextfield(
               controller: passwordController,
@@ -71,9 +70,9 @@ class LoginScreen extends StatelessWidget {
               obscureText: true,
              ),
 
-             const SizedBox(height: 10),
+             const SizedBox(height: 20),
 
-             const Padding(
+             /* const Padding(
               padding: EdgeInsets.symmetric(horizontal: 25.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -84,11 +83,25 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ],
               ),
-             ),
+             ), */
 
-             const SizedBox(height: 20),
+             // const SizedBox(height: 20),
 
-             MyButton(
+             /* TextButton(
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+                  },
+                  child: Container(
+                    color: const Color.fromARGB(255, 158, 110, 110),
+                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    child: const Text(
+                      'Sign Up',
+                      style: TextStyle(color: Colors.white, fontSize: 13.0),
+                    ),
+                  ),
+                ), */
+
+              SignupButton(
               onTap: () {
                 // Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
                 Navigator.pushNamed(context, AppRoutes.landscape);
@@ -142,7 +155,9 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              Row(
+              const BackButton(),
+
+              /* Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
@@ -161,20 +176,11 @@ class LoginScreen extends StatelessWidget {
 
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen()));
                     },
-                    child: const Text(
-                      'Register',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
-
-                      ),
-                      ),
-                    
+                    child: const Text('Clickable Text Using GestureDetector'),
                      ),
                 ],
-              )
+              ) */
 
             
             ],

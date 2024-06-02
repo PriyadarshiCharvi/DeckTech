@@ -1,4 +1,5 @@
 import 'package:decktech/screens/deck_service.dart';
+import 'package:decktech/screens/exit_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -51,12 +52,12 @@ class _GameScreenState extends State<GameScreen> {
             fit: BoxFit.cover,
           ),
         ),
-        child: const Center(
+        child: Center(
           child: Column(
             children: [
-              SizedBox(height: 50),
+              const SizedBox(height: 50),
 
-              Text(
+              const Text(
                 "POKER TABLE",
                 style: TextStyle(
                   color: Color.fromARGB(255, 208, 135, 135),
@@ -64,12 +65,34 @@ class _GameScreenState extends State<GameScreen> {
                   fontWeight: FontWeight.bold)
               ),
 
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
 
               
-              BackButton(),
+              const BackButton(),
+
+              const SizedBox(
+                height: 50,
+              ),
+
+              TextButton(
+                  onPressed: () {
+                   Navigator.push(context, MaterialPageRoute(builder: (context) => const ExitScreen()));
+                  },
+                  child: Container(
+                    color: const Color.fromARGB(255, 158, 110, 110),
+                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    child: const Text(
+                      'Logout',
+                      style: TextStyle(color: Colors.white, fontSize: 13.0),
+                    ),
+                  ),
+                ),
+
+
+
+              
 
               
             ],
