@@ -40,10 +40,18 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color.fromARGB(255, 130, 37, 37),
-      body: SafeArea(
-        child: Center(
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 130, 37, 37),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+              'assets/backdrop.png',
+            ),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: const Center(
           child: Column(
             children: [
               SizedBox(height: 50),
@@ -61,14 +69,13 @@ class _GameScreenState extends State<GameScreen> {
               ),
 
               
-
               BackButton(),
 
               
             ],
 
           )
-        )
+        ),
       ),
     );
   }

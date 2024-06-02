@@ -12,9 +12,9 @@ class LoginScreen extends StatelessWidget {
   final passwordController = TextEditingController();
 
   void signUserIn() {
-    /* await FirebaseAuth.instance.signInWithEmailAndPassword(
+     /* await FirebaseAuth.instance.signInWithEmailAndPassword(
       email: emailController.text, 
-      password: passwordController.text,
+      password: passwordController.text, 
       ); */
 
   } 

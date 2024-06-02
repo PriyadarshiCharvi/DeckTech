@@ -1,6 +1,7 @@
 // import 'package:decktech/screens/auth_page.dart';
 // ignore: unused_import
 import 'package:decktech/models/orientation_model.dart';
+import 'package:decktech/screens/exit_screen.dart';
 import 'package:decktech/screens/game_screen.dart';
 import 'package:decktech/screens/home_screen.dart';
 import 'package:decktech/screens/login_screen.dart';
@@ -26,7 +27,7 @@ class DeckTech extends StatelessWidget {
 
   Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
     if (settings.name == AppRoutes.home) {
-      return MaterialPageRoute(builder: (context) => const HomeScreen());
+      return MaterialPageRoute(builder: (context) => const ExitScreen());
     } else if (settings.name == AppRoutes.portrait) {
       return MaterialPageRoute(
         builder: (context) => LoginScreen(),
