@@ -1,25 +1,33 @@
-// import 'package:auth/auth.dart';
 import 'package:decktech/components/my_textfield.dart';
 import 'package:decktech/screens/register_screen.dart';
 import 'package:decktech/screens/routes.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../components/my_button.dart';
 import '../components/square_tile.dart';
+import '../services/firebase_auth_implementation.dart';
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final usernameController = TextEditingController();
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
 
-  void signUserIn() {
-     /* await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: emailController.text, 
-      password: passwordController.text, 
-      ); */
+class _LoginScreenState extends State<LoginScreen> {
 
-  } 
+  final FirebaseAuthImplementation _auth = FirebaseAuthImplementation();
+
+  TextEditingController _usernameController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +58,7 @@ class LoginScreen extends StatelessWidget {
              const SizedBox(height: 25),
 
              MyTextfield(
-              controller: usernameController,
+              controller: _usernameController,
               hintText: 'Username',
               obscureText: false,
              ),
@@ -66,7 +74,7 @@ class LoginScreen extends StatelessWidget {
              const SizedBox(height: 10), */
 
              MyTextfield(
-              controller: passwordController,
+              controller: _passwordController,
               hintText: 'Password',
               obscureText: true,
              ),
@@ -90,6 +98,7 @@ class LoginScreen extends StatelessWidget {
 
              MyButton(
               onTap: () {
+                _login();
                 // Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
                 Navigator.pushNamed(context, AppRoutes.landscape);
               },
@@ -183,5 +192,23 @@ class LoginScreen extends StatelessWidget {
       )
     );
 
+  }
+
+  void _login() async {
+    String username = _usernameController.text;
+    String password = _passwordController.text;
+
+    User? user = await _auth.signInWithEmailAndPassword(username, password);
+
+    if (user != null) {
+      if (kDebugMode) {
+        print("User is successfully logged in");
+      }
+      Navigator.pushNamed(context, "/portrait");
+    } else {
+      if (kDebugMode) {
+        print("Some error occurred");
+      }
+    }
   }
 }

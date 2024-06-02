@@ -1,5 +1,6 @@
 import 'package:decktech/screens/deck_service.dart';
 import 'package:decktech/screens/exit_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -78,6 +79,7 @@ class _GameScreenState extends State<GameScreen> {
 
               TextButton(
                   onPressed: () {
+                    FirebaseAuth.instance.signOut();
                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ExitScreen()));
                   },
                   child: Container(

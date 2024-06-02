@@ -1,32 +1,13 @@
 {
   "project_info": {
-    "project_number": "958810472746",
-    "project_id": "decktech-e8aba",
-    "storage_bucket": "decktech-e8aba.appspot.com"
+    "project_number": "119585597521",
+    "project_id": "decktech-orbital",
+    "storage_bucket": "decktech-orbital.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:958810472746:android:0daa349203de22004c1e53",
-        "android_client_info": {
-          "package_name": "com.android.application"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyC2-8V2b3vDWRt9A4_FHU8bMKJzx2EFW-c"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:958810472746:android:f24ae2dadde613594c1e53",
+        "mobilesdk_app_id": "1:119585597521:android:2cb4be77cbd27ef3703070",
         "android_client_info": {
           "package_name": "com.example.decktech"
         }
@@ -34,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC2-8V2b3vDWRt9A4_FHU8bMKJzx2EFW-c"
+          "current_key": "AIzaSyD7TaHPYXZzIa9BghoUftJsNhijLxHf1f4"
         }
       ],
       "services": {

@@ -1,24 +1,45 @@
-// import 'package:auth/auth.dart';
+
 import 'package:decktech/components/my_textfield.dart';
 import 'package:decktech/components/signup_button.dart';
+import 'package:decktech/screens/login_screen.dart';
 import 'package:decktech/screens/routes.dart';
+import 'package:decktech/services/firebase_auth_implementation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../components/square_tile.dart';
 
-class RegisterScreen extends StatelessWidget {
-  RegisterScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
-  final emailController = TextEditingController();
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+
+}
+
+  /* final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final usernameController = TextEditingController();
 
   void signUserIn() {
-     /* await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: emailController.text, 
-      password: passwordController.text, 
-      ); */
 
-  } 
+  }  */
+class _RegisterScreenState extends State<RegisterScreen> {
+
+  final FirebaseAuthImplementation _auth = FirebaseAuthImplementation();
+
+  TextEditingController _usernameController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +70,7 @@ class RegisterScreen extends StatelessWidget {
              const SizedBox(height: 25),
 
              MyTextfield(
-              controller: usernameController,
+              controller: _usernameController,
               hintText: 'Username',
               obscureText: false,
              ),
@@ -57,7 +78,7 @@ class RegisterScreen extends StatelessWidget {
              const SizedBox(height: 10),
 
               MyTextfield(
-              controller: emailController,
+              controller: _emailController,
               hintText: 'Email',
               obscureText: false,
              ),
@@ -65,7 +86,7 @@ class RegisterScreen extends StatelessWidget {
              const SizedBox(height: 10),
 
              MyTextfield(
-              controller: passwordController,
+              controller: _passwordController,
               hintText: 'Password',
               obscureText: true,
              ),
@@ -102,10 +123,7 @@ class RegisterScreen extends StatelessWidget {
                 ), */
 
               SignupButton(
-              onTap: () {
-                // Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-                Navigator.pushNamed(context, AppRoutes.landscape);
-              },
+              onTap: _register,
              ),
 
              const SizedBox(height: 30),
@@ -189,5 +207,24 @@ class RegisterScreen extends StatelessWidget {
       )
     );
 
+  }
+
+  void _register() async {
+    String username = _usernameController.text;
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    User? user = await _auth.signUpWithEmailAndPassword(email, password);
+
+    if (user != null) {
+      if (kDebugMode) {
+        print("User is successfully created");
+      }
+      Navigator.pushNamed(context, "/portrait");
+    } else {
+      if (kDebugMode) {
+        print("Some error occurred");
+      }
+    }
   }
 }

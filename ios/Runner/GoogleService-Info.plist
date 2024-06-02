@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyBJPfHqLLbMvY5aFLcY1q5K9ifdCTk7bOA</string>
+	<string>AIzaSyCu0Inm8ZHKf-WlRQRYABhH23bD04FTqy0</string>
 	<key>GCM_SENDER_ID</key>
-	<string>958810472746</string>
+	<string>119585597521</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.example.decktech</string>
 	<key>PROJECT_ID</key>
-	<string>decktech-e8aba</string>
+	<string>decktech-orbital</string>
 	<key>STORAGE_BUCKET</key>
-	<string>decktech-e8aba.appspot.com</string>
+	<string>decktech-orbital.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:958810472746:ios:28236e451030255c4c1e53</string>
+	<string>1:119585597521:ios:3595b796331fce15703070</string>
 </dict>
 </plist>
