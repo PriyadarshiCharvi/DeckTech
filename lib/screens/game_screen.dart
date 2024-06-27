@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:decktech/gameplay/poker_game.dart';
 import 'package:decktech/models/player_model.dart';
 import 'package:flutter/material.dart';
@@ -39,6 +41,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       PlayerModel(name: 'Computer 2'),
       PlayerModel(name: 'Computer 3'),
     ];
+    
 
     // Initialize animation controllers and animations for community cards
     _communityCardControllers = List.generate(5, (_) => AnimationController(
@@ -137,7 +140,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     _player1CardController!.forward();
     _player2CardController!.forward();
     _player3CardController!.forward();
+
   }
+
+  
+
 
   @override
   void dispose() {
@@ -151,6 +158,27 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     _player2CardController?.dispose();
     _player3CardController?.dispose();
     super.dispose();
+  }
+
+  void onFold() {
+    // Implement fold logic
+    print('Fold button pressed');
+  }
+
+  void onCheck() {
+    // Implement check logic
+    print('Check button pressed');
+  }
+
+  void onCall() {
+    // Implement call logic
+    print('Call button pressed');
+  }
+
+  void onRaise() {
+    // Implement raise logic
+    print('Raise button pressed');
+    // Show slider for raise amount
   }
 
 @override
@@ -327,25 +355,66 @@ Widget build(BuildContext context) {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+              
+                      const SizedBox(height: 1),
+                      // Action buttons
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: pokerGame.players.firstWhere((player) => player.isHuman).cards.asMap().entries.map((entry) {
-                          int idx = entry.key;
-                          var card = entry.value;
-                          return SlideTransition(
-                            position: _playerCardAnimations[idx],
-                            child: Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: CachedNetworkImage(
-                                imageUrl: card.image,
-                                width: 40,
-                                height: 60,
-                                placeholder: (context, url) => const CircularProgressIndicator(),
-                                errorWidget: (context, url, error) => const Icon(Icons.error),
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: onFold,
+                              child: const Text('Fold'),
+                            ),
+
+                            Spacer(),
+
+                            ElevatedButton(
+                                  onPressed: onCheck,
+                                  child: const Text('Check'),
+                            ),
+                          
+                            Spacer(),
+
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: pokerGame.players.firstWhere((player) => player.isHuman).cards.asMap().entries.map((entry) {
+                                    int idx = entry.key;
+                                    var card = entry.value;
+                                    return SlideTransition(
+                                      position: _playerCardAnimations[idx],
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(2.0),
+                                        child: CachedNetworkImage(
+                                          imageUrl: card.image,
+                                          width: 40,
+                                          height: 60,
+                                          placeholder: (context, url) => const CircularProgressIndicator(),
+                                          errorWidget: (context, url, error) => const Icon(Icons.error),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
                               ),
                             ),
-                          );
-                        }).toList(),
+
+                            Spacer(),
+
+                              ElevatedButton(
+                                  onPressed: onCall,
+                                  child: const Text('Call'),
+                                ),
+
+                                Spacer(),
+
+                              ElevatedButton(
+                                onPressed: onRaise,
+                                child: const Text('Raise'),
+                              ),
+                          ],
                       ),
                     ],
                   ),
