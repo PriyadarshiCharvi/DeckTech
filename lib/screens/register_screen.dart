@@ -17,13 +17,6 @@ class RegisterScreen extends StatefulWidget {
 
 }
 
-  /* final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final usernameController = TextEditingController();
-
-  void signUserIn() {
-
-  }  */
 class _RegisterScreenState extends State<RegisterScreen> {
 
   final FirebaseAuthImplementation _auth = FirebaseAuthImplementation();
@@ -93,35 +86,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
              const SizedBox(height: 20),
 
-             /* const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 25.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    'Forgot Password?',
-                    style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                  ),
-                ],
-              ),
-             ), */
-
-             // const SizedBox(height: 20),
-
-             /* TextButton(
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
-                  },
-                  child: Container(
-                    color: const Color.fromARGB(255, 158, 110, 110),
-                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                    child: const Text(
-                      'Sign Up',
-                      style: TextStyle(color: Colors.white, fontSize: 13.0),
-                    ),
-                  ),
-                ), */
-
               SignupButton(
               onTap: _register,
              ),
@@ -174,32 +138,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 30),
 
               const BackButton(),
-
-              /* Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Not a member?',
-                    style: TextStyle(color: Color.fromARGB(255, 29, 28, 28)),
-                  ),
-                  const SizedBox(width: 4),
-
-                  /* Text(
-                    'Register now',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ), */
-
-                  GestureDetector(
-                    onTap: () {
-                    },
-                    child: const Text('Clickable Text Using GestureDetector'),
-                     ),
-                ],
-              ) */
-
             
             ],
           )

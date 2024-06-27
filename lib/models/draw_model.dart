@@ -6,14 +6,16 @@ class DrawModel {
 
   DrawModel({
     required this.remaining,
-    this.cards = const[],
+    this.cards = const [],
   });
 
   factory DrawModel.fromJson(Map<String, dynamic> json) {
-    final cards = json['cards']
-        .map<CardModel>((card) => CardModel.fromJson(card))
-        .toList();
-        
-    return DrawModel(remaining: json['remaining'], cards: cards);
+    final List<dynamic> cardList = json['cards'];
+    final List<CardModel> cards = cardList.map((card) => CardModel.fromJson(card)).toList();
+
+    return DrawModel(
+      remaining: json['remaining'],
+      cards: cards,
+    );
   }
 }

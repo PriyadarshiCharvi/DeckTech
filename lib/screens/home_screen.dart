@@ -1,6 +1,5 @@
-import 'package:decktech/screens/routes.dart';
 import 'package:flutter/material.dart';
-
+import 'package:decktech/screens/routes.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -9,55 +8,95 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 130, 37, 37),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent, // Transparent app bar
+        elevation: 0, // No shadow
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, AppRoutes.portrait);
+            },
+            icon: const Icon(Icons.logout),
+            color: Colors.red,
+          ),
+          const SizedBox(width: 10), // Adjust width as needed for spacing
+        ],
+      ),
       body: SafeArea(
-        child: Center(
-          child: Column(
-            children: [
-              const SizedBox(height: 50),
+        child: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Title
+                const Text(
+                  'DeckTech',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 208, 135, 135),
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Arial', // Replace with your desired font family
+                  ),
+                ),
+                const SizedBox(height: 20),
 
-              const Text(
-                "LOGGED IN",
-                style: TextStyle(
-                  color: Color.fromARGB(255, 208, 135, 135),
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold)
-              ),
-
-              const SizedBox(
-                height: 30,
-              ),
-
-            /* const PlayButton(
-              onTap: () {
-                Navigator.pushNamed(context, AppRoutes.rotating);
-              },
-             ), */
-
-             TextButton(
+                // Options
+                ElevatedButton(
                   onPressed: () {
                     Navigator.pushNamed(context, AppRoutes.rotating);
                   },
-                  child: Container(
-                    color: const Color.fromARGB(255, 158, 110, 110),
-                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                    child: const Text(
-                      'Create New Game',
-                      style: TextStyle(color: Colors.white, fontSize: 13.0),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white, backgroundColor: const Color.fromARGB(255, 158, 110, 110), // Text color
+                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                    textStyle: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Arial', // Replace with your desired font family
                     ),
                   ),
+                  child: const Text('Create New Game'),
                 ),
+                const SizedBox(height: 20),
 
-             const SizedBox(
-              height: 30,
-              ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Add functionality for joining existing game
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white, backgroundColor: const Color.fromARGB(255, 158, 110, 110), // Text color
+                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                    textStyle: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Arial', // Replace with your desired font family
+                    ),
+                  ),
+                  child: const Text('Join Existing Game'),
+                ),
+                const SizedBox(height: 20),
 
-              const BackButton(),
+                ElevatedButton(
+                  onPressed: () {
+                    // Add functionality for spectating game
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white, backgroundColor: const Color.fromARGB(255, 158, 110, 110), // Text color
+                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                    textStyle: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Arial', // Replace with your desired font family
+                    ),
+                  ),
+                  child: const Text('Spectate Game'),
+                ),
+                const SizedBox(height: 50),
 
-              
-            ],
-
-          )
-        )
+                // Additional content as per your design
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
