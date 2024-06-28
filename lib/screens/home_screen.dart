@@ -77,7 +77,7 @@ class HomeScreen extends StatelessWidget {
 
                 ElevatedButton(
                   onPressed: () {
-                    // Add functionality for spectating game
+                    Navigator.pushNamed(context, AppRoutes.landscape2);
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white, backgroundColor: const Color.fromARGB(255, 158, 110, 110), // Text color
