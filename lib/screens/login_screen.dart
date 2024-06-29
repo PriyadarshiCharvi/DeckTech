@@ -19,8 +19,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final FirebaseAuthImplementation _auth = FirebaseAuthImplementation();
 
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void dispose() {
@@ -161,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterScreen()));
                     },
                     child: const Text(
                       'Register',
@@ -195,12 +195,14 @@ class _LoginScreenState extends State<LoginScreen> {
       if (kDebugMode) {
         print("User is successfully logged in");
       }
+      // ignore: use_build_context_synchronously
       Navigator.pushNamed(context, AppRoutes.landscape);
     } else {
       if (kDebugMode) {
         print("Wrong email/password");
       }
-      Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      // ignore: use_build_context_synchronously
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
     }
   }
 }

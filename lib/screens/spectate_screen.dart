@@ -151,7 +151,7 @@ class _SpectateScreenState extends State<SpectateScreen> with TickerProviderStat
                         ],
                       ),
                     ),
-                    const SizedBox(height: 1),
+                    const SizedBox(height: 35),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,

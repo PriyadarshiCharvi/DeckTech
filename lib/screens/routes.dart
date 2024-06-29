@@ -17,6 +17,6 @@ class AppRoutes {
     portrait: (context) => const LoginScreen(),
     landscape: (context) => const HomeScreen(),
     rotating: (context) => const GameScreen(),
-    landscape2: (context) => const SpectateScreen(), // Add SpectateScreen route
+    landscape2: (context) => const SpectateScreen(), 
   };
 }

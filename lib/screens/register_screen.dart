@@ -1,8 +1,6 @@
 
 import 'package:decktech/components/my_textfield.dart';
 import 'package:decktech/components/signup_button.dart';
-import 'package:decktech/screens/login_screen.dart';
-import 'package:decktech/screens/routes.dart';
 import 'package:decktech/services/firebase_auth_implementation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -21,9 +19,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final FirebaseAuthImplementation _auth = FirebaseAuthImplementation();
 
-  TextEditingController _usernameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void dispose() {

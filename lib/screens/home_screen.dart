@@ -9,8 +9,8 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 130, 37, 37),
       appBar: AppBar(
-        backgroundColor: Colors.transparent, // Transparent app bar
-        elevation: 0, // No shadow
+        backgroundColor: Colors.transparent, 
+        elevation: 0, 
         actions: [
           IconButton(
             onPressed: () {
@@ -19,7 +19,7 @@ class HomeScreen extends StatelessWidget {
             icon: const Icon(Icons.logout),
             color: Colors.red,
           ),
-          const SizedBox(width: 10), // Adjust width as needed for spacing
+          const SizedBox(width: 10), 
         ],
       ),
       body: SafeArea(
@@ -35,7 +35,7 @@ class HomeScreen extends StatelessWidget {
                     color: Color.fromARGB(255, 208, 135, 135),
                     fontSize: 36,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Arial', // Replace with your desired font family
+                    fontFamily: 'Arial', 
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -51,7 +51,7 @@ class HomeScreen extends StatelessWidget {
                     textStyle: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Arial', // Replace with your desired font family
+                      fontFamily: 'Arial', 
                     ),
                   ),
                   child: const Text('Create New Game'),
@@ -60,7 +60,7 @@ class HomeScreen extends StatelessWidget {
 
                 ElevatedButton(
                   onPressed: () {
-                    // Add functionality for joining existing game
+                    //TO-DO
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white, backgroundColor: const Color.fromARGB(255, 158, 110, 110), // Text color
@@ -68,7 +68,7 @@ class HomeScreen extends StatelessWidget {
                     textStyle: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Arial', // Replace with your desired font family
+                      fontFamily: 'Arial', 
                     ),
                   ),
                   child: const Text('Join Existing Game'),
@@ -85,14 +85,14 @@ class HomeScreen extends StatelessWidget {
                     textStyle: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Arial', // Replace with your desired font family
+                      fontFamily: 'Arial', 
                     ),
                   ),
                   child: const Text('Spectate Game'),
                 ),
                 const SizedBox(height: 50),
 
-                // Additional content as per your design
+                
               ],
             ),
           ),

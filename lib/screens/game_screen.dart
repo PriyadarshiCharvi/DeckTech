@@ -135,8 +135,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       });
     }
 
-    // Start animations for opponent cards based on game logic
-    // For example, when dealing opponent cards
+    // Start animations for opponent cards
     _player1CardController!.forward();
     _player2CardController!.forward();
     _player3CardController!.forward();
@@ -161,24 +160,23 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   void onFold() {
-    // Implement fold logic
+    // TO-DO: Implement fold logic
     print('Fold button pressed');
   }
 
   void onCheck() {
-    // Implement check logic
+    // TO-DO: Implement check logic
     print('Check button pressed');
   }
 
   void onCall() {
-    // Implement call logic
+    // TO-DO: Implement call logic
     print('Call button pressed');
   }
 
   void onRaise() {
-    // Implement raise logic
+    // TO-DO: Implement raise logic
     print('Raise button pressed');
-    // Show slider for raise amount
   }
 
 @override
@@ -199,7 +197,6 @@ Widget build(BuildContext context) {
         : Stack(
           
             children: [
-              // Background poker table image
               Container(
                 decoration: const BoxDecoration(
                   image: DecorationImage(
@@ -216,7 +213,7 @@ Widget build(BuildContext context) {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const Text(
-                              'Player 2', // Replace with actual player name or identifier
+                              'Player 2', 
                               style: TextStyle(color: Colors.white),
                             ),
                             SlideTransition(
@@ -227,7 +224,7 @@ Widget build(BuildContext context) {
                                   Padding(
                                     padding: const EdgeInsets.all(2.0),
                                     child: Image.asset(
-                                      'assets/card_back.png', // Replace with your card back image asset path
+                                      'assets/card_back.png',
                                       width: 40,
                                       height: 60,
                                     ),
@@ -235,7 +232,7 @@ Widget build(BuildContext context) {
                                   Padding(
                                     padding: const EdgeInsets.all(2.0),
                                     child: Image.asset(
-                                      'assets/card_back.png', // Replace with your card back image asset path
+                                      'assets/card_back.png',
                                       width: 40,
                                       height: 60,
                                     ),
@@ -366,14 +363,14 @@ Widget build(BuildContext context) {
                               child: const Text('Fold'),
                             ),
 
-                            Spacer(),
+                            const Spacer(),
 
                             ElevatedButton(
                                   onPressed: onCheck,
                                   child: const Text('Check'),
                             ),
                           
-                            Spacer(),
+                            const Spacer(),
 
                             Expanded(
                               child: Align(
@@ -401,14 +398,14 @@ Widget build(BuildContext context) {
                               ),
                             ),
 
-                            Spacer(),
+                            const Spacer(),
 
                               ElevatedButton(
                                   onPressed: onCall,
                                   child: const Text('Call'),
                                 ),
 
-                                Spacer(),
+                                const Spacer(),
 
                               ElevatedButton(
                                 onPressed: onRaise,
