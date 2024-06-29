@@ -91,8 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
              MyButton(
               onTap: () {
                 _login();
-                // Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-              },
+               },
              ),
 
              const SizedBox(height: 30),
@@ -150,14 +149,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(color: Color.fromARGB(255, 29, 28, 28)),
                   ),
                   const SizedBox(width: 4),
-
-                  /* Text(
-                    'Register now',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ), */
 
                   GestureDetector(
                     onTap: () {

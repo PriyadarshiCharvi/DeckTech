@@ -120,6 +120,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     });
   }
 
+  bool showPlayerCards = true;
+
   void _startAnimations() {
     // Start animations for community cards
     for (int i = 0; i < _communityCardControllers.length; i++) {
@@ -129,6 +131,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     }
 
     // Start animations for player cards
+    if (showPlayerCards) {
     for (int i = 0; i < _playerCardControllers.length; i++) {
       Future.delayed(Duration(milliseconds: i * 200), () {
         _playerCardControllers[i].forward();
@@ -139,6 +142,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     _player1CardController!.forward();
     _player2CardController!.forward();
     _player3CardController!.forward();
+  }
+
+  setState(() {
+    showPlayerCards = true; 
+  });
 
   }
 
@@ -179,6 +187,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     print('Raise button pressed');
   }
 
+  int revealState = 0;
+  
+
 @override
 Widget build(BuildContext context) {
   return Scaffold(
@@ -191,6 +202,39 @@ Widget build(BuildContext context) {
           Navigator.pop(context);
         },
       ),
+
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.play_arrow),
+          onPressed: () {
+            setState(() {
+              if (revealState == 0) {
+                // Reveal the first 3 cards simultaneously
+                for (int i = 0; i < 3; i++) {
+                  _communityCardControllers[i].forward();
+                }
+                revealState = 3;
+              } else if (revealState >= 3 && revealState < 5) {
+                // Reveal the next card
+                _communityCardControllers[revealState].forward();
+                revealState++;
+              } else {
+                // Reset the game
+                revealState = 0;
+                showPlayerCards = false;
+                for (var controller in _communityCardControllers) {
+                  controller.reset();
+                }
+                pokerGame.startGame().then((_) {
+                  Future.delayed(const Duration(milliseconds: 500), () {
+                    _startAnimations();  
+                });
+              });
+              }
+            });
+          },
+          ),
+      ],
     ),
     body: isLoading
         ? const Center(child: CircularProgressIndicator())
@@ -290,17 +334,27 @@ Widget build(BuildContext context) {
                     children: pokerGame.communityCards.asMap().entries.map((entry) {
                       int idx = entry.key;
                       var card = entry.value;
+                      Widget cardWidget;
+                      if (idx < revealState) {
+                        cardWidget = CachedNetworkImage(
+                          imageUrl: card.image,
+                          width: 40,
+                          height: 60,
+                          placeholder: (context, url) => const CircularProgressIndicator(),
+                          errorWidget: (context, url, error) => const Icon(Icons.error),
+                        );
+                      } else {
+                        cardWidget = const Image(
+                          image: AssetImage('assets/card_back.png'),
+                          width: 40,
+                          height: 60,
+                        );
+                      }
                       return SlideTransition(
                         position: _communityCardAnimations[idx],
                         child: Padding(
                           padding: const EdgeInsets.all(2.0),
-                          child: CachedNetworkImage(
-                            imageUrl: card.image,
-                            width: 40,
-                            height: 60,
-                            placeholder: (context, url) => const CircularProgressIndicator(),
-                            errorWidget: (context, url, error) => const Icon(Icons.error),
-                          ),
+                          child: cardWidget,
                         ),
                       );
                     }).toList(),
@@ -420,6 +474,6 @@ Widget build(BuildContext context) {
             ],
           ),
   );
-}
+} 
 
 }

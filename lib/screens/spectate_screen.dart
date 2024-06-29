@@ -20,6 +20,9 @@ class _SpectateScreenState extends State<SpectateScreen> with TickerProviderStat
   late List<AnimationController> _playerCardControllers;
   late List<Animation<Offset>> _playerCardAnimations;
 
+  // Variable to track the reveal state of community cards
+  int revealState = 0;
+
   @override
   void initState() {
     super.initState();
@@ -70,6 +73,7 @@ class _SpectateScreenState extends State<SpectateScreen> with TickerProviderStat
   }
 
   void _startAnimations() {
+
     for (int i = 0; i < _communityCardControllers.length; i++) {
       Future.delayed(Duration(milliseconds: i * 200), () {
         _communityCardControllers[i].forward();
@@ -106,6 +110,41 @@ class _SpectateScreenState extends State<SpectateScreen> with TickerProviderStat
             Navigator.pop(context);
           },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.play_arrow),
+            onPressed: () {
+              setState(() {
+                if (revealState == 0) {
+                  // Reveal the first 3 cards simultaneously
+                  for (int i = 0; i < 3; i++) {
+                    _communityCardControllers[i].forward();
+                  }
+                  revealState = 3;
+                } else if (revealState >= 3 && revealState < 5) {
+                  // Reveal the next card
+                  _communityCardControllers[revealState].forward();
+                  revealState++;
+                } else {
+                  // Reset the game
+                  revealState = 0;
+                  for (var controller in _communityCardControllers) {
+                    controller.reset();
+                  }
+                  for (var controller in _playerCardControllers) {
+                    controller.reset();  // Resetting player card animations
+                  }
+                  pokerGame.startGame().then((_) {
+                     setState(() {
+                      isLoading = false;
+                      _startAnimations(); 
+                    });
+                  });
+                }
+              });
+            },
+          ),
+        ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -151,6 +190,7 @@ class _SpectateScreenState extends State<SpectateScreen> with TickerProviderStat
                         ],
                       ),
                     ),
+  
                     const SizedBox(height: 35),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -187,17 +227,27 @@ class _SpectateScreenState extends State<SpectateScreen> with TickerProviderStat
                           children: pokerGame.communityCards.asMap().entries.map((entry) {
                             int idx = entry.key;
                             var card = entry.value;
+                            Widget cardWidget;
+                            if (idx < revealState) {
+                              cardWidget = CachedNetworkImage(
+                                imageUrl: card.image,
+                                width: 40,
+                                height: 60,
+                                placeholder: (context, url) => const CircularProgressIndicator(),
+                                errorWidget: (context, url, error) => const Icon(Icons.error),
+                              );
+                            } else {
+                              cardWidget = const Image(
+                                image: AssetImage('assets/card_back.png'),
+                                width: 40,
+                                height: 60,
+                              );
+                            }
                             return SlideTransition(
                               position: _communityCardAnimations[idx],
                               child: Padding(
                                 padding: const EdgeInsets.all(2.0),
-                                child: CachedNetworkImage(
-                                  imageUrl: card.image,
-                                  width: 40,
-                                  height: 60,
-                                  placeholder: (context, url) => const CircularProgressIndicator(),
-                                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                                ),
+                                child: cardWidget,
                               ),
                             );
                           }).toList(),
