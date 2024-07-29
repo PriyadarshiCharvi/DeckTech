@@ -194,12 +194,12 @@ class PokerGame {
     //var rand = random(0,2);
     //print(rand);
     //actions[rand];
-    if (players[currentPlayerIndex].hasFolded = true {
+    if (players[currentPlayerIndex].hasFolded = true) {
       nextPlayer();
     }
     var actions = [call, raiseS];
     var rand = Random().nextInt(2);
-    print(rand);
+    print(actions[rand]);
     actions[rand]();
     /*
     while(true) {

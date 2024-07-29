@@ -423,14 +423,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                         child: const Text('Fold'),
                       ),
 
-                      const Spacer(),
 
                       ElevatedButton(
                         onPressed: onCheck,
                         child: const Text('Check'),
                       ),
 
-                      const Spacer(),
 
                       ElevatedButton(
                         onPressed: onCall,
@@ -476,21 +474,28 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
                       ElevatedButton(
                         onPressed: onRaise1,
-                        child: const Text('Raise by 50'),
+                        child: const Text('Raise 50'),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(72, 36),
+                        ),
                       ),
 
-                      const Spacer(),
 
                       ElevatedButton(
                         onPressed: onRaise2,
-                        child: const Text('Raise by 150'),
+                        child: const Text('Raise 150'),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(72, 36),
+                        ),
                       ),
 
-                      const Spacer(),
 
                       ElevatedButton(
                         onPressed: onRaise3,
                         child: const Text('All in'),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(72, 36),
+                        ),
                       ),
                     ],
                   ),
