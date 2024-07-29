@@ -4,6 +4,7 @@ import 'package:decktech/gameplay/poker_game.dart';
 import 'package:decktech/models/player_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:poker/poker.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -17,19 +18,17 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   bool isLoading = true;
 
   late List<AnimationController> _communityCardControllers;
-  late List<Animation<Offset>> _communityCardAnimations;
-
   late List<AnimationController> _playerCardControllers;
-  late List<Animation<Offset>> _playerCardAnimations;
-
   AnimationController? _player1CardController;
-  Animation<Offset>? _player1CardAnimation;
-
   AnimationController? _player2CardController;
-  Animation<Offset>? _player2CardAnimation;
-
   AnimationController? _player3CardController;
+
+  late List<Animation<Offset>> _communityCardAnimations;
+  late List<Animation<Offset>> _playerCardAnimations;
+  Animation<Offset>? _player1CardAnimation;
+  Animation<Offset>? _player2CardAnimation;
   Animation<Offset>? _player3CardAnimation;
+
 
   @override
   void initState() {
@@ -41,13 +40,14 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       PlayerModel(name: 'Computer 2'),
       PlayerModel(name: 'Computer 3'),
     ];
-    
+
 
     // Initialize animation controllers and animations for community cards
-    _communityCardControllers = List.generate(5, (_) => AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    ));
+    _communityCardControllers = List.generate(5, (_) =>
+        AnimationController(
+          duration: const Duration(milliseconds: 500),
+          vsync: this,
+        ));
 
     _communityCardAnimations = _communityCardControllers.map((controller) {
       return Tween<Offset>(
@@ -60,10 +60,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     }).toList();
 
     // Initialize animation controllers and animations for player cards
-    _playerCardControllers = List.generate(2, (_) => AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    ));
+    _playerCardControllers = List.generate(2, (_) =>
+        AnimationController(
+          duration: const Duration(milliseconds: 500),
+          vsync: this,
+        ));
 
     _playerCardAnimations = _playerCardControllers.map((controller) {
       return Tween<Offset>(
@@ -132,25 +133,22 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
     // Start animations for player cards
     if (showPlayerCards) {
-    for (int i = 0; i < _playerCardControllers.length; i++) {
-      Future.delayed(Duration(milliseconds: i * 200), () {
-        _playerCardControllers[i].forward();
-      });
+      for (int i = 0; i < _playerCardControllers.length; i++) {
+        Future.delayed(Duration(milliseconds: i * 200), () {
+          _playerCardControllers[i].forward();
+        });
+      }
+
+      // Start animations for opponent cards
+      _player1CardController!.forward();
+      _player2CardController!.forward();
+      _player3CardController!.forward();
     }
 
-    // Start animations for opponent cards
-    _player1CardController!.forward();
-    _player2CardController!.forward();
-    _player3CardController!.forward();
+    setState(() {
+      showPlayerCards = true;
+    });
   }
-
-  setState(() {
-    showPlayerCards = true; 
-  });
-
-  }
-
-  
 
 
   @override
@@ -168,304 +166,331 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   void onFold() {
-    // TO-DO: Implement fold logic
     print('Fold button pressed');
+    pokerGame.fold();
   }
 
   void onCheck() {
-    // TO-DO: Implement check logic
     print('Check button pressed');
+    pokerGame.check();
   }
 
   void onCall() {
-    // TO-DO: Implement call logic
     print('Call button pressed');
+    pokerGame.call();
   }
 
-  void onRaise() {
-    // TO-DO: Implement raise logic
-    print('Raise button pressed');
+  void onRaise1() {
+    print('Raise1 button pressed');
+    pokerGame.raiseS();
   }
 
-  int revealState = 0;
-  
+  void onRaise2() {
+    print('Raise2 button pressed');
+    pokerGame.raiseP();
+  }
 
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: const Color.fromARGB(255, 130, 37, 37),
-    appBar: AppBar(
-      backgroundColor: const Color.fromARGB(255, 158, 110, 110),
-      title: const Text('POKER TABLE'),
-      leading: BackButton(
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
+  void onRaise3() {
+    print('Raise3 button pressed');
+    pokerGame.raiseA();
+  }
 
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.play_arrow),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 130, 37, 37),
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 158, 110, 110),
+        title: const Text('Table'),
+        leading: BackButton(
           onPressed: () {
-            setState(() {
-              if (revealState == 0) {
-                // Reveal the first 3 cards simultaneously
-                for (int i = 0; i < 3; i++) {
-                  _communityCardControllers[i].forward();
-                }
-                revealState = 3;
-              } else if (revealState >= 3 && revealState < 5) {
-                // Reveal the next card
-                _communityCardControllers[revealState].forward();
-                revealState++;
-              } else {
-                // Reset the game
-                revealState = 0;
-                showPlayerCards = false;
-                for (var controller in _communityCardControllers) {
-                  controller.reset();
-                }
-                pokerGame.startGame().then((_) {
-                  Future.delayed(const Duration(milliseconds: 500), () {
-                    _startAnimations();  
-                });
-              });
-              }
-            });
+            Navigator.pop(context);
           },
+        ),
+
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.play_arrow),
+            onPressed: () {
+              setState(() {
+                pokerGame.roundEnd();
+                if (pokerGame.revealState == 0) {
+                  // Reveal the first 3 cards simultaneously
+                  for (int i = 0; i < 3; i++) {
+                    _communityCardControllers[i].forward();
+                  }
+                  pokerGame.revealState = 3;
+                } else
+                if (pokerGame.revealState >= 3 && pokerGame.revealState < 5) {
+                  // Reveal the next card
+                  _communityCardControllers[pokerGame.revealState].forward();
+                  pokerGame.revealState++;
+                }
+              });
+            },
           ),
-      ],
-    ),
-    body: isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : Stack(
-          
+        ],
+      ),
+      body: Stack(
+
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/backdrop.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/backdrop.png'),
-                    fit: BoxFit.cover,
-                  ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Player 2 - \$${pokerGame.players[2].stack}',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    SlideTransition(
+                      position: _player2CardAnimation!,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: Image.asset(
+                              'assets/card_back.png',
+                              width: 40,
+                              height: 60,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: Image.asset(
+                              'assets/card_back.png',
+                              width: 40,
+                              height: 60,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'Player 2', 
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            SlideTransition(
-                              position: _player2CardAnimation!,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Image.asset(
-                                      'assets/card_back.png',
-                                      width: 40,
-                                      height: 60,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Image.asset(
-                                      'assets/card_back.png',
-                                      width: 40,
-                                      height: 60,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
 
-                  const SizedBox(height: 1),
-                  // Opponents' cards and Community cards
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Player 1 (left of community cards)
-                      if (_player1CardAnimation != null)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Player 1', 
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            SlideTransition(
-                              position: _player1CardAnimation!,
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Image.asset(
-                                      'assets/card_back.png', 
-                                      width: 40,
-                                      height: 60,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Image.asset(
-                                      'assets/card_back.png', 
-                                      width: 40,
-                                      height: 60,
-                                    ),
-                                  ),
-                                ],
+              const SizedBox(height: 1),
+
+
+              // Opponents' cards and Community cards
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Player 1 (left of community cards)
+                  if (_player1CardAnimation != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Player 1 - \$${pokerGame.players[1].stack}',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        SlideTransition(
+                          position: _player1CardAnimation!,
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Image.asset(
+                                  'assets/card_back.png',
+                                  width: 40,
+                                  height: 60,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      // Player 2 (above community cards)
-                      Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: pokerGame.communityCards.asMap().entries.map((entry) {
-                      int idx = entry.key;
-                      var card = entry.value;
-                      Widget cardWidget;
-                      if (idx < revealState) {
-                        cardWidget = CachedNetworkImage(
-                          imageUrl: card.image,
-                          width: 40,
-                          height: 60,
-                          placeholder: (context, url) => const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) => const Icon(Icons.error),
-                        );
-                      } else {
-                        cardWidget = const Image(
-                          image: AssetImage('assets/card_back.png'),
-                          width: 40,
-                          height: 60,
-                        );
-                      }
-                      return SlideTransition(
-                        position: _communityCardAnimations[idx],
-                        child: Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: cardWidget,
-                        ),
-                      );
-                    }).toList(),
-                  ),   
-                      // Player 3 (right of community cards)
-                      if (_player3CardAnimation != null)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            const Text(
-                              'Player 3', 
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            SlideTransition(
-                              position: _player3CardAnimation!,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Image.asset(
-                                      'assets/card_back.png', 
-                                      width: 40,
-                                      height: 60,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: Image.asset(
-                                      'assets/card_back.png', 
-                                      width: 40,
-                                      height: 60,
-                                    ),
-                                  ),
-                                ],
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Image.asset(
+                                  'assets/card_back.png',
+                                  width: 40,
+                                  height: 60,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                    ],
-                  ),
+                      ],
+                    ),
                   Column(
                     children: [
-                      const Text(
-                        'Your Cards',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                      Text('Pot - \$${pokerGame.potValue}',
+                          style: TextStyle(color: Colors.white)),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: pokerGame.communityCards
+                            .asMap()
+                            .entries
+                            .map((entry) {
+                          int idx = entry.key;
+                          var card = entry.value;
+                          Widget cardWidget;
+                          if (idx < pokerGame.revealState) {
+                            cardWidget = CachedNetworkImage(
+                              imageUrl: card.image,
+                              width: 40,
+                              height: 60,
+                              placeholder: (context,
+                                  url) => const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                            );
+                          } else {
+                            cardWidget = const Image(
+                              image: AssetImage('assets/card_back.png'),
+                              width: 40,
+                              height: 60,
+                            );
+                          }
+                          return SlideTransition(
+                            position: _communityCardAnimations[idx],
+                            child: Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: cardWidget,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+
+
+                  // Player 3 (right of community cards)
+                  if (_player3CardAnimation != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Player 3 - \$${pokerGame.players[3].stack}',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        SlideTransition(
+                          position: _player3CardAnimation!,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Image.asset(
+                                  'assets/card_back.png',
+                                  width: 40,
+                                  height: 60,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Image.asset(
+                                  'assets/card_back.png',
+                                  width: 40,
+                                  height: 60,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+              Column(
+                children: [
+                  Text(
+                    'You - \$${pokerGame.players[0].stack}',
+                    style: TextStyle(color: Colors.white),
+                  ),
+
+                  const SizedBox(height: 1),
+
+
+                  // Action buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: onFold,
+                        child: const Text('Fold'),
+                      ),
+
+                      const Spacer(),
+
+                      ElevatedButton(
+                        onPressed: onCheck,
+                        child: const Text('Check'),
+                      ),
+
+                      const Spacer(),
+
+                      ElevatedButton(
+                        onPressed: onCall,
+                        child: const Text('Call'),
+                      ),
+
+                      const Spacer(),
+
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: pokerGame.players
+                                .firstWhere((player) => player.isHuman)
+                                .cards
+                                .asMap()
+                                .entries
+                                .map((entry) {
+                              int idx = entry.key;
+                              var card = entry.value;
+                              return SlideTransition(
+                                position: _playerCardAnimations[idx],
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: CachedNetworkImage(
+                                    imageUrl: card.image,
+                                    width: 40,
+                                    height: 60,
+                                    placeholder: (context,
+                                        url) => const CircularProgressIndicator(),
+                                    errorWidget: (context, url,
+                                        error) => const Icon(Icons.error),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
                         ),
                       ),
-              
-                      const SizedBox(height: 1),
-                      // Action buttons
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                              onPressed: onFold,
-                              child: const Text('Fold'),
-                            ),
 
-                            const Spacer(),
+                      const Spacer(),
 
-                            ElevatedButton(
-                                  onPressed: onCheck,
-                                  child: const Text('Check'),
-                            ),
-                          
-                            const Spacer(),
+                      ElevatedButton(
+                        onPressed: onRaise1,
+                        child: const Text('Raise by 50'),
+                      ),
 
-                            Expanded(
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: pokerGame.players.firstWhere((player) => player.isHuman).cards.asMap().entries.map((entry) {
-                                    int idx = entry.key;
-                                    var card = entry.value;
-                                    return SlideTransition(
-                                      position: _playerCardAnimations[idx],
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(2.0),
-                                        child: CachedNetworkImage(
-                                          imageUrl: card.image,
-                                          width: 40,
-                                          height: 60,
-                                          placeholder: (context, url) => const CircularProgressIndicator(),
-                                          errorWidget: (context, url, error) => const Icon(Icons.error),
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                            ),
+                      const Spacer(),
 
-                            const Spacer(),
+                      ElevatedButton(
+                        onPressed: onRaise2,
+                        child: const Text('Raise by 150'),
+                      ),
 
-                              ElevatedButton(
-                                  onPressed: onCall,
-                                  child: const Text('Call'),
-                                ),
+                      const Spacer(),
 
-                                const Spacer(),
-
-                              ElevatedButton(
-                                onPressed: onRaise,
-                                child: const Text('Raise'),
-                              ),
-                          ],
+                      ElevatedButton(
+                        onPressed: onRaise3,
+                        child: const Text('All in'),
                       ),
                     ],
                   ),
@@ -473,7 +498,8 @@ Widget build(BuildContext context) {
               ),
             ],
           ),
-  );
-} 
-
+        ],
+      ),
+    );
+  }
 }

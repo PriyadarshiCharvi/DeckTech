@@ -456,6 +456,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
+  poker:
+    dependency: "direct main"
+    description:
+      name: poker
+      sha256: "7a6a1aff465fb8fa5c50fbb1f73b11b80885d444e285d0961a31e58f7daf65d0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0"
   provider:
     dependency: "direct main"
     description:

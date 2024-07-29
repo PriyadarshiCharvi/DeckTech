@@ -56,24 +56,8 @@ class HomeScreen extends StatelessWidget {
                   ),
                   child: const Text('Create New Game'),
                 ),
-                const SizedBox(height: 20),
 
-                ElevatedButton(
-                  onPressed: () {
-                    //TO-DO
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white, backgroundColor: const Color.fromARGB(255, 158, 110, 110), // Text color
-                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                    textStyle: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Arial', 
-                    ),
-                  ),
-                  child: const Text('Join Existing Game'),
-                ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 40),
 
                 ElevatedButton(
                   onPressed: () {

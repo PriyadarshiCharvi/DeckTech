@@ -71,21 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
               obscureText: true,
              ),
 
-             const SizedBox(height: 10),
-
-             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 25.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    'Forgot Password?',
-                    style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                  ),
-                ],
-              ),
-             ),
-
              const SizedBox(height: 20),
 
              MyButton(
@@ -107,46 +92,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: Colors.grey[400],
                       ),
                     ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text(
-                        'Or continue with',
-                        style: TextStyle(color: Color.fromARGB(255, 25, 22, 22)),
-                      ),
-                    ),
-                    const Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Color.fromRGBO(189, 189, 189, 1),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // google button
-                  SquareTile(imagePath: 'lib/icons/google.png'),
-
-                  SizedBox(width: 25),
-
-                  // apple button
-                  SquareTile(imagePath: 'lib/icons/apple.png')
-                ],
-              ),
-
-              const SizedBox(height: 30),
+                  ]
+                )
+             ),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
                     'Not a member?',
-                    style: TextStyle(color: Color.fromARGB(255, 29, 28, 28)),
+                    style: TextStyle(color: Color.fromARGB(255, 29, 28, 28), fontSize: 20),
                   ),
                   const SizedBox(width: 4),
 
@@ -159,6 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
+                        fontSize: 20
 
                       ),
                       ),
