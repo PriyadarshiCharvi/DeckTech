@@ -35,7 +35,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     super.initState();
     pokerGame = PokerGame();
     pokerGame.players = [
-      PlayerModel(name: 'You', isHuman: true),
+      PlayerModel(name: 'Player', isHuman: true),
       PlayerModel(name: 'Computer 1'),
       PlayerModel(name: 'Computer 2'),
       PlayerModel(name: 'Computer 3'),
@@ -407,7 +407,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               Column(
                 children: [
                   Text(
-                    'You - \$${pokerGame.players[0].stack}',
+                    'Player - \$${pokerGame.players[0].stack}',
                     style: TextStyle(color: Colors.white),
                   ),
 

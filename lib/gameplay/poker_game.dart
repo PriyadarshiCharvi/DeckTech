@@ -101,9 +101,9 @@ class PokerGame {
       potValue += raiseAmount;
       prevBet += 50;
       print(players[currentPlayerIndex].name);
-      print("currentRoundBet: ${players[currentPlayerIndex].currentRoundBet}");
-      print("stack: ${players[currentPlayerIndex].stack}");
-      print("potValue: $potValue");
+      print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
+      print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
+      print("Pot: $potValue");
       nextPlayer();
     } else {
     }
@@ -119,9 +119,9 @@ class PokerGame {
       potValue += raiseAmount;
       prevBet += 150;
       print(players[currentPlayerIndex].name);
-      print("currentRoundBet: ${players[currentPlayerIndex].currentRoundBet}");
-      print("stack: ${players[currentPlayerIndex].stack}");
-      print("potValue: $potValue");
+      print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
+      print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
+      print("Pot: $potValue");
       nextPlayer();
     } else {
     }
@@ -139,9 +139,9 @@ class PokerGame {
       prevBet = betAmount;
     }
     print(players[currentPlayerIndex].name);
-    print("currentRoundBet: ${players[currentPlayerIndex].currentRoundBet}");
-    print("stack: ${players[currentPlayerIndex].stack}");
-    print("potValue: $potValue");
+    print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
+    print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
+    print("Pot: $potValue");
     nextPlayer();
   }
 
@@ -153,9 +153,9 @@ class PokerGame {
       players[currentPlayerIndex].currentRoundBet += prevBet;
       potValue += prevBet;
       print(players[currentPlayerIndex].name);
-      print("currentRoundBet: ${players[currentPlayerIndex].currentRoundBet}");
-      print("stack: ${players[currentPlayerIndex].stack}");
-      print("potValue: $potValue");
+      print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
+      print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
+      print("Pot: $potValue");
       nextPlayer();
     } else {
     }
@@ -167,9 +167,10 @@ class PokerGame {
       players[currentPlayerIndex].actedThisRound = true;
       nextPlayer();
       print(players[currentPlayerIndex].name);
-      print("currentRoundBet: ${players[currentPlayerIndex].currentRoundBet}");
-      print("stack: ${players[currentPlayerIndex].stack}");
-      print("potValue: $potValue");
+      print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
+      print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
+      print("Pot: $potValue");
+      nextPlayer();
     } else {
       print("Cannot Check");
     }
@@ -182,37 +183,23 @@ class PokerGame {
     nextPlayer();
   }
 
-  //Random number generator
+  //Initialize random number generator
   int random(int min, int max) {
     return min + Random().nextInt(max - min);
   }
 
   //Computer action
   Future<void> computerActions() async{
-    print("comp actions");
-    //var actions = [call(), raiseS()];
-    //var rand = random(0,2);
-    //print(rand);
-    //actions[rand];
-    if (players[currentPlayerIndex].hasFolded = true) {
+    print("${players[currentPlayerIndex].name} Action");
+    if (players[currentPlayerIndex].hasFolded == true) {
       nextPlayer();
     }
-    var actions = [call, raiseS];
-    var rand = Random().nextInt(2);
-    print(actions[rand]);
-    actions[rand]();
-    /*
-    while(true) {
-      if (bettingRoundComplete()) {
-        return;
-      }
-      var actions = [fold(), check(), call(), raiseS(), raiseP(), raiseA()];
-      Random random = new Random();
-      int randomNumber = random.nextInt(6);
-        Future.delayed(const Duration(seconds: 2), () {
-          actions[randomNumber];
-        });
-        nextPlayer();
-    } */
+    var rand = random(0, 2);
+    print(rand);
+    if (rand == 0) {
+      call();
+    } else if (rand == 1) {
+      raiseS();
+    }
   }
 }
