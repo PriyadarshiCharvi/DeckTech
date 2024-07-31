@@ -5,11 +5,11 @@ import 'package:decktech/models/card_model.dart';
 class PlayerModel {
   final String name;
   final bool isHuman;
-  var currentRoundBet;
-  var stack;
-  var hasFolded;
-  var isAllIn;
-  var actedThisRound;
+  int currentRoundBet;
+  int stack;
+  bool hasFolded;
+  bool isAllIn;
+  bool actedThisRound;
   List<CardModel> cards;
 
   PlayerModel({

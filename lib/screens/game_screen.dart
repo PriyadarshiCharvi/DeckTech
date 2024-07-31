@@ -165,6 +165,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  void refreshStacksAndPots() {
+    setState(() {
+    });
+  }
+
   void onFold() {
     print('Fold button pressed');
     pokerGame.fold();
@@ -251,7 +256,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   children: [
                     Text(
                       'Player 2 - \$${pokerGame.players[2].stack}',
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
                     SlideTransition(
                       position: _player2CardAnimation!,
@@ -296,7 +301,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       children: [
                         Text(
                           'Player 1 - \$${pokerGame.players[1].stack}',
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                         ),
                         SlideTransition(
                           position: _player1CardAnimation!,
@@ -326,7 +331,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   Column(
                     children: [
                       Text('Pot - \$${pokerGame.potValue}',
-                          style: TextStyle(color: Colors.white)),
+                          style: const TextStyle(color: Colors.white)),
 
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -374,7 +379,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       children: [
                         Text(
                           'Player 3 - \$${pokerGame.players[3].stack}',
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                         ),
                         SlideTransition(
                           position: _player3CardAnimation!,
@@ -408,7 +413,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 children: [
                   Text(
                     'Player - \$${pokerGame.players[0].stack}',
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                   ),
 
                   const SizedBox(height: 1),

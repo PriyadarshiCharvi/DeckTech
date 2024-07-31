@@ -53,6 +53,7 @@ class PokerGame {
     }
   }
 
+  //Next player action handler
   void nextPlayer() {
     if (bettingRoundComplete()) {
       roundEnd();
@@ -60,6 +61,12 @@ class PokerGame {
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
     if (currentPlayerIndex != 0) {
       computerActions();
+    } else {
+      if (players[0].hasFolded == true) {
+        nextPlayer();
+      }
+      print("------ACTION ON YOU------");
+      return;
     }
   }
 
@@ -87,43 +94,46 @@ class PokerGame {
         players[i].actedThisRound = false;
       }
       prevBet = 0;
-      print("Betting round complete");
+      print("------BETTING ROUND COMPLETE------");
+      print("------PRESS ARROW ON TOP RIGHT------");
       return;
   }
 
   // Player action: Raise by 50
   Future<void> raiseS() async{
-    int raiseAmount = 50 + prevBet;
-    if (raiseAmount <= players[currentPlayerIndex].stack) {
+    int betAmount = 50 + prevBet;
+    if (betAmount <= players[currentPlayerIndex].stack) {
       players[currentPlayerIndex].actedThisRound = true;
-      players[currentPlayerIndex].stack -= raiseAmount;
-      players[currentPlayerIndex].currentRoundBet += raiseAmount;
-      potValue += raiseAmount;
+      potValue += betAmount - players[currentPlayerIndex].currentRoundBet;
+      players[currentPlayerIndex].stack -= betAmount - players[currentPlayerIndex].currentRoundBet;
+      players[currentPlayerIndex].currentRoundBet = betAmount;
       prevBet += 50;
-      print(players[currentPlayerIndex].name);
+      print("${players[currentPlayerIndex].name} raise 50");
       print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
       print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
       print("Pot: $potValue");
       nextPlayer();
     } else {
+      print("Cannot Raise 50");
     }
   }
 
   // Player action: Raise by 150
   Future<void> raiseP() async{
-    int raiseAmount = 150 + prevBet;
-    if (raiseAmount <= players[currentPlayerIndex].stack) {
+    int betAmount = 150 + prevBet;
+    if (betAmount <= players[currentPlayerIndex].stack) {
       players[currentPlayerIndex].actedThisRound = true;
-      players[currentPlayerIndex].stack -= raiseAmount;
-      players[currentPlayerIndex].currentRoundBet += raiseAmount;
-      potValue += raiseAmount;
+      potValue += betAmount - players[currentPlayerIndex].currentRoundBet;
+      players[currentPlayerIndex].stack -= betAmount - players[currentPlayerIndex].currentRoundBet;
+      players[currentPlayerIndex].currentRoundBet = betAmount;
       prevBet += 150;
-      print(players[currentPlayerIndex].name);
+      print("${players[currentPlayerIndex].name} raise 150");
       print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
       print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
       print("Pot: $potValue");
       nextPlayer();
     } else {
+      print("Cannot Raise 150");
     }
   }
 
@@ -138,7 +148,7 @@ class PokerGame {
     if (betAmount > prevBet) {
       prevBet = betAmount;
     }
-    print(players[currentPlayerIndex].name);
+    print("${players[currentPlayerIndex].name} all in");
     print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
     print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
     print("Pot: $potValue");
@@ -149,15 +159,16 @@ class PokerGame {
   Future<void> call() async{
     if (prevBet <= players[currentPlayerIndex].stack) {
       players[currentPlayerIndex].actedThisRound = true;
-      players[currentPlayerIndex].stack -= prevBet;
-      players[currentPlayerIndex].currentRoundBet += prevBet;
-      potValue += prevBet;
-      print(players[currentPlayerIndex].name);
+      potValue += prevBet - players[currentPlayerIndex].currentRoundBet;
+      players[currentPlayerIndex].stack -= prevBet - players[currentPlayerIndex].currentRoundBet;
+      players[currentPlayerIndex].currentRoundBet = prevBet;
+      print("${players[currentPlayerIndex].name} call");
       print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
       print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
       print("Pot: $potValue");
       nextPlayer();
     } else {
+      print("Cannot Call");
     }
   }
 
@@ -165,8 +176,7 @@ class PokerGame {
   Future<void> check() async{
     if (prevBet == 0) {
       players[currentPlayerIndex].actedThisRound = true;
-      nextPlayer();
-      print(players[currentPlayerIndex].name);
+      print("${players[currentPlayerIndex].name} check");
       print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
       print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
       print("Pot: $potValue");
@@ -180,6 +190,11 @@ class PokerGame {
   Future<void> fold() async{
     players[currentPlayerIndex].actedThisRound = true;
     players[currentPlayerIndex].hasFolded = true;
+    print("${players[currentPlayerIndex].name} fold");
+    print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
+    players[currentPlayerIndex].currentRoundBet = prevBet;
+    print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
+    print("Pot: $potValue");
     nextPlayer();
   }
 
@@ -190,12 +205,11 @@ class PokerGame {
 
   //Computer action
   Future<void> computerActions() async{
-    print("${players[currentPlayerIndex].name} Action");
+    print("------${players[currentPlayerIndex].name} Action------");
     if (players[currentPlayerIndex].hasFolded == true) {
       nextPlayer();
     }
     var rand = random(0, 2);
-    print(rand);
     if (rand == 0) {
       call();
     } else if (rand == 1) {
