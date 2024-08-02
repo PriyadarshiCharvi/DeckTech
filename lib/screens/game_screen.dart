@@ -255,7 +255,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      'Player 2 - \$${pokerGame.players[2].stack}',
+                      'Computer 2 - \$${pokerGame.players[2].stack}',
                       style: const TextStyle(color: Colors.white),
                     ),
                     SlideTransition(
@@ -300,7 +300,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Player 1 - \$${pokerGame.players[1].stack}',
+                          'Computer 1 - \$${pokerGame.players[1].stack}',
                           style: const TextStyle(color: Colors.white),
                         ),
                         SlideTransition(
@@ -378,7 +378,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          'Player 3 - \$${pokerGame.players[3].stack}',
+                          'Computer 3 - \$${pokerGame.players[3].stack}',
                           style: const TextStyle(color: Colors.white),
                         ),
                         SlideTransition(

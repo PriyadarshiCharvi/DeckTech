@@ -54,33 +54,54 @@ class PokerGame {
   }
 
   //Next player action handler
-  void nextPlayer() {
-    if (bettingRoundComplete()) {
-      roundEnd();
-    }
+  int nextPlayer() {
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+
     if (currentPlayerIndex != 0) {
       computerActions();
+      return 0;
     } else {
       if (players[0].hasFolded == true) {
+        print("You have folded");
+        nextPlayer();
+      } else if (players[0].isAllIn) {
+        print("You are all in");
         nextPlayer();
       }
       print("------ACTION ON YOU------");
-      return;
+      return 1;
     }
   }
 
   //Check if betting round is complete
   bool bettingRoundComplete() {
     var standard = 0;
-    for (var i = 0; i < 4; i++) {
-      if (!players[i].hasFolded && !players[i].isAllIn) {
-        standard = players[i].currentRoundBet;
+    int counter = 0;
+    int tempWinningPlayer = 0;
+
+    for (var playerIndex = 0; playerIndex < 4; playerIndex++) {
+      if (players[playerIndex].hasFolded) {counter += 1;}
+      else {
+        tempWinningPlayer = playerIndex;
+        if (!players[playerIndex].isAllIn) standard = players[playerIndex].currentRoundBet;
+      }
+    }
+
+    //All other players fold
+    if (counter == 3) {
+      winner(tempWinningPlayer);
+    }
+    /*
+    for (var playerIndex = 0; playerIndex < 4; playerIndex++) {
+      if (!players[playerIndex].hasFolded && !players[playerIndex].isAllIn) {
+        standard = players[playerIndex].currentRoundBet;
         break;
       }
     }
-    for (var i = 0; i < 4; i++) {
-      if (!players[i].actedThisRound || ((!players[i].hasFolded) && players[i].currentRoundBet != standard && !players[i].isAllIn)) {
+     */
+
+    for (var playerIndex = 0; playerIndex < 4; playerIndex++) {
+      if (!players[playerIndex].actedThisRound || ((!players[playerIndex].hasFolded) && players[playerIndex].currentRoundBet != standard && !players[playerIndex].isAllIn)) {
         return false;
       }
     }
@@ -89,9 +110,9 @@ class PokerGame {
 
   // Round end
   Future<void> roundEnd() async{
-      for (int i = 0; i < 4; i++) {
-        players[i].currentRoundBet = 0;
-        players[i].actedThisRound = false;
+      for (int playerIndex = 0; playerIndex < 4; playerIndex++) {
+        players[playerIndex].currentRoundBet = 0;
+        players[playerIndex].actedThisRound = false;
       }
       prevBet = 0;
       print("------BETTING ROUND COMPLETE------");
@@ -108,13 +129,17 @@ class PokerGame {
       players[currentPlayerIndex].stack -= betAmount - players[currentPlayerIndex].currentRoundBet;
       players[currentPlayerIndex].currentRoundBet = betAmount;
       prevBet += 50;
+
       print("${players[currentPlayerIndex].name} raise 50");
       print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
       print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
       print("Pot: $potValue");
-      nextPlayer();
+
+      if (bettingRoundComplete()) {roundEnd();}
+      else {nextPlayer();}
     } else {
       print("Cannot Raise 50");
+      if (currentPlayerIndex != 0) computerActions();
     }
   }
 
@@ -127,13 +152,17 @@ class PokerGame {
       players[currentPlayerIndex].stack -= betAmount - players[currentPlayerIndex].currentRoundBet;
       players[currentPlayerIndex].currentRoundBet = betAmount;
       prevBet += 150;
+
       print("${players[currentPlayerIndex].name} raise 150");
       print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
       print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
       print("Pot: $potValue");
-      nextPlayer();
+
+      if (bettingRoundComplete()) {roundEnd();}
+      else {nextPlayer();}
     } else {
       print("Cannot Raise 150");
+      if (currentPlayerIndex != 0) computerActions();
     }
   }
 
@@ -145,14 +174,15 @@ class PokerGame {
     players[currentPlayerIndex].isAllIn = true;
     players[currentPlayerIndex].currentRoundBet += betAmount;
     potValue += betAmount;
-    if (betAmount > prevBet) {
-      prevBet = betAmount;
-    }
+    if (betAmount > prevBet) prevBet = betAmount;
+
     print("${players[currentPlayerIndex].name} all in");
     print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
     print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
     print("Pot: $potValue");
-    nextPlayer();
+
+    if (bettingRoundComplete()) {roundEnd();}
+    else {nextPlayer();}
   }
 
   // Player action: Call
@@ -162,13 +192,17 @@ class PokerGame {
       potValue += prevBet - players[currentPlayerIndex].currentRoundBet;
       players[currentPlayerIndex].stack -= prevBet - players[currentPlayerIndex].currentRoundBet;
       players[currentPlayerIndex].currentRoundBet = prevBet;
+
       print("${players[currentPlayerIndex].name} call");
       print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
       print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
       print("Pot: $potValue");
-      nextPlayer();
+
+      if (bettingRoundComplete()) {roundEnd();}
+      else {nextPlayer();}
     } else {
       print("Cannot Call");
+      if (currentPlayerIndex != 0) computerActions();
     }
   }
 
@@ -176,13 +210,17 @@ class PokerGame {
   Future<void> check() async{
     if (prevBet == 0) {
       players[currentPlayerIndex].actedThisRound = true;
+
       print("${players[currentPlayerIndex].name} check");
       print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
       print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
       print("Pot: $potValue");
-      nextPlayer();
+
+      if (bettingRoundComplete()) {roundEnd();}
+      else {nextPlayer();}
     } else {
       print("Cannot Check");
+      if (currentPlayerIndex != 0) computerActions();
     }
   }
 
@@ -190,12 +228,16 @@ class PokerGame {
   Future<void> fold() async{
     players[currentPlayerIndex].actedThisRound = true;
     players[currentPlayerIndex].hasFolded = true;
+
     print("${players[currentPlayerIndex].name} fold");
     print("${players[currentPlayerIndex].name} current round bet: ${players[currentPlayerIndex].currentRoundBet}");
-    players[currentPlayerIndex].currentRoundBet = prevBet;
     print("${players[currentPlayerIndex].name} stack: ${players[currentPlayerIndex].stack}");
     print("Pot: $potValue");
-    nextPlayer();
+
+    players[currentPlayerIndex].currentRoundBet = prevBet;
+
+    if (bettingRoundComplete()) {roundEnd();}
+    else {nextPlayer();}
   }
 
   //Initialize random number generator
@@ -206,14 +248,57 @@ class PokerGame {
   //Computer action
   Future<void> computerActions() async{
     print("------${players[currentPlayerIndex].name} Action------");
-    if (players[currentPlayerIndex].hasFolded == true) {
+
+    if (players[currentPlayerIndex].hasFolded) {
+      print("${players[currentPlayerIndex].name} has folded");
       nextPlayer();
     }
-    var rand = random(0, 2);
-    if (rand == 0) {
-      call();
-    } else if (rand == 1) {
-      raiseS();
+
+    if (players[currentPlayerIndex].isAllIn) {
+      print("${players[currentPlayerIndex].name} is all in");
+      nextPlayer();
     }
+
+    var rand = random(0, 100);
+
+    if (rand < 50) {call();}
+    else if (rand < 72) {raiseS();}
+    else if (rand < 85) {raiseP();}
+    else if (rand < 90) {raiseA();}
+    else {fold();}
+
   }
+
+  //Declare winner
+  Future<void> winner(int i) async{
+    //TODO - other win conditions
+    print("${players[i].name} IS THE ONLY REMAINING PLAYER");
+    print("${players[i].name} WINS THE GAME");
+    roundEnd();
+  }
+
 }
+
+/*
+
+Card player1card1 = Card(rank: Rank.ace, suit: Suit.spades);
+
+Hand player1hand = Hand(cards: [player1card1, player2card2]);
+
+List<Card> communityCards = [card1, card2, card3, card4, card5];
+
+HandResult result = HandEvaluator.evaluate(player1hand, communityCards);
+
+print(‘Best Hand: ${result.bestHand}’);
+
+print(‘Hand Rank: ${result.rank}’);
+
+"cards": [
+        {
+            "image": "https://www.deckofcardsapi.com/static/img/AS.png",
+            "value": "ACE",
+            "suit": "SPADES",
+            "code": "AS"
+        }
+    ]
+ */
