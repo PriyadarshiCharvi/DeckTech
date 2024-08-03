@@ -11,6 +11,7 @@ class PlayerModel {
   bool isAllIn;
   bool actedThisRound;
   List<CardModel> cards;
+  bool showCards;
 
   PlayerModel({
     required this.name,
@@ -21,5 +22,6 @@ class PlayerModel {
     this.isHuman = false,
     this.actedThisRound = false,
     this.cards = const [],
+    this.showCards = false,
   });
 }

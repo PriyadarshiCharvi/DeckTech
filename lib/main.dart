@@ -24,7 +24,7 @@ class DeckTech extends StatelessWidget {
       return MaterialPageRoute(builder: (context) => const ExitScreen());
     } else if (settings.name == AppRoutes.portrait) {
       return MaterialPageRoute(
-        builder: (context) => LoginScreen(),
+        builder: (context) => const LoginScreen(),
         settings: rotationSettings(settings, ScreenOrientation.portraitOnly),
       );
     } else if (settings.name == AppRoutes.landscape) {
@@ -50,7 +50,7 @@ class DeckTech extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      home: const LoginScreen(),
       onGenerateRoute: _onGenerateRoute,
       navigatorObservers: [_observer],
     );

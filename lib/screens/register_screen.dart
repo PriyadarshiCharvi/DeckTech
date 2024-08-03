@@ -90,52 +90,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
              const SizedBox(height: 30),
 
-             
-             Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.grey[400],
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text(
-                        'Or continue with',
-                        style: TextStyle(color: Color.fromARGB(255, 25, 22, 22)),
-                      ),
-                    ),
-                    const Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Color.fromRGBO(189, 189, 189, 1),
-                      ),
-                    ),
-                  ],
-                ),
+              const BackButton(
+                color: Color.fromARGB(255, 255, 252, 252),
               ),
-
-              const SizedBox(height: 30),
-
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // google button
-                  SquareTile(imagePath: 'lib/icons/google.png'),
-
-                  SizedBox(width: 25),
-
-                  // apple button
-                  SquareTile(imagePath: 'lib/icons/apple.png')
-                ],
-              ),
-
-              const SizedBox(height: 30),
-
-              const BackButton(),
             
             ],
           )

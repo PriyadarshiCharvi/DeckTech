@@ -54,7 +54,7 @@ class HomeScreen extends StatelessWidget {
                       fontFamily: 'Arial', 
                     ),
                   ),
-                  child: const Text('Create New Game'),
+                  child: const Text('Start Game'),
                 ),
 
                 const SizedBox(height: 40),
@@ -72,7 +72,7 @@ class HomeScreen extends StatelessWidget {
                       fontFamily: 'Arial', 
                     ),
                   ),
-                  child: const Text('Spectate Game'),
+                  child: const Text('Training Mode'),
                 ),
                 const SizedBox(height: 50),
 

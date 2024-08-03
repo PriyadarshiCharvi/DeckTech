@@ -4,7 +4,6 @@ import 'package:decktech/gameplay/poker_game.dart';
 import 'package:decktech/models/player_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:poker/poker.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -200,6 +199,16 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     pokerGame.raiseA();
   }
 
+  void revealAllComputerCards() {
+    setState(() {
+      for (var player in pokerGame.players) {
+        if (!player.isHuman) {
+          player.showCards = true;
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -230,6 +239,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   // Reveal the next card
                   _communityCardControllers[pokerGame.revealState].forward();
                   pokerGame.revealState++;
+                } else if (pokerGame.revealState == 5) {
+                  revealAllComputerCards();
                 }
               });
             },
@@ -262,24 +273,26 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       position: _player2CardAnimation!,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Padding(
+                        children: pokerGame.players[2].cards.map((card) {
+                          return Padding(
                             padding: const EdgeInsets.all(2.0),
-                            child: Image.asset(
-                              'assets/card_back.png',
-                              width: 40,
-                              height: 60,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: Image.asset(
-                              'assets/card_back.png',
-                              width: 40,
-                              height: 60,
-                            ),
-                          ),
-                        ],
+                            child: pokerGame.players[2].showCards
+                                ? CachedNetworkImage(
+                                    imageUrl: card.image,
+                                    width: 40,
+                                    height: 60,
+                                    placeholder: (context, url) =>
+                                        const CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  )
+                                : Image.asset(
+                                    'assets/card_back.png',
+                                    width: 40,
+                                    height: 60,
+                                  ),
+                          );
+                        }).toList(),
                       ),
                     ),
                   ],
@@ -306,24 +319,26 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                         SlideTransition(
                           position: _player1CardAnimation!,
                           child: Row(
-                            children: [
-                              Padding(
+                            children: pokerGame.players[1].cards.map((card) {
+                              return Padding(
                                 padding: const EdgeInsets.all(2.0),
-                                child: Image.asset(
-                                  'assets/card_back.png',
-                                  width: 40,
-                                  height: 60,
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(2.0),
-                                child: Image.asset(
-                                  'assets/card_back.png',
-                                  width: 40,
-                                  height: 60,
-                                ),
-                              ),
-                            ],
+                                child: pokerGame.players[1].showCards
+                                    ? CachedNetworkImage(
+                                        imageUrl: card.image,
+                                        width: 40,
+                                        height: 60,
+                                        placeholder: (context, url) =>
+                                            const CircularProgressIndicator(),
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(Icons.error),
+                                      )
+                                    : Image.asset(
+                                        'assets/card_back.png',
+                                        width: 40,
+                                        height: 60,
+                                      ),
+                              );
+                            }).toList(),
                           ),
                         ),
                       ],
@@ -385,24 +400,26 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           position: _player3CardAnimation!,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Padding(
+                            children: pokerGame.players[3].cards.map((card) {
+                              return Padding(
                                 padding: const EdgeInsets.all(2.0),
-                                child: Image.asset(
-                                  'assets/card_back.png',
-                                  width: 40,
-                                  height: 60,
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(2.0),
-                                child: Image.asset(
-                                  'assets/card_back.png',
-                                  width: 40,
-                                  height: 60,
-                                ),
-                              ),
-                            ],
+                                child: pokerGame.players[3].showCards
+                                    ? CachedNetworkImage(
+                                        imageUrl: card.image,
+                                        width: 40,
+                                        height: 60,
+                                        placeholder: (context, url) =>
+                                            const CircularProgressIndicator(),
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(Icons.error),
+                                      )
+                                    : Image.asset(
+                                        'assets/card_back.png',
+                                        width: 40,
+                                        height: 60,
+                                      ),
+                              );
+                            }).toList(),
                           ),
                         ),
                       ],
@@ -479,28 +496,28 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
                       ElevatedButton(
                         onPressed: onRaise1,
-                        child: const Text('Raise 50'),
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(72, 36),
                         ),
+                        child: const Text('Raise 50'),
                       ),
 
 
                       ElevatedButton(
                         onPressed: onRaise2,
-                        child: const Text('Raise 150'),
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(72, 36),
                         ),
+                        child: const Text('Raise 150'),
                       ),
 
 
                       ElevatedButton(
                         onPressed: onRaise3,
-                        child: const Text('All in'),
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(72, 36),
                         ),
+                        child: const Text('All in'),
                       ),
                     ],
                   ),
