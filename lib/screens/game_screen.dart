@@ -28,6 +28,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   Animation<Offset>? _player2CardAnimation;
   Animation<Offset>? _player3CardAnimation;
 
+ 
+
 
   @override
   void initState() {
@@ -209,6 +211,36 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     });
   }
 
+   int revealState = 0;
+
+   void resetGameAndDealNewCards() {
+    setState(() {
+      for (var controller in _communityCardControllers) {
+        controller.reset();
+      }
+      for (var controller in _playerCardControllers) {
+        controller.reset();
+      }
+      _player1CardController?.reset();
+      _player2CardController?.reset();
+      _player3CardController?.reset();
+
+      pokerGame = PokerGame();
+      pokerGame.players = [
+        PlayerModel(name: 'Player', isHuman: true),
+        PlayerModel(name: 'Computer 1'),
+        PlayerModel(name: 'Computer 2'),
+        PlayerModel(name: 'Computer 3'),
+      ];
+
+      pokerGame.startGame().then((_) {
+        revealState = 0;
+        _startAnimations();
+      });
+    });
+  }
+   
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -228,21 +260,25 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             onPressed: () {
               setState(() {
                 pokerGame.roundEnd();
-                if (pokerGame.revealState == 0) {
+                if (revealState == 0) {
                   // Reveal the first 3 cards simultaneously
                   for (int i = 0; i < 3; i++) {
                     _communityCardControllers[i].forward();
                   }
-                  pokerGame.revealState = 3;
+                  revealState = 3;
                 } else
-                if (pokerGame.revealState >= 3 && pokerGame.revealState < 5) {
+                if (revealState >= 3 && revealState < 5) {
                   // Reveal the next card
-                  _communityCardControllers[pokerGame.revealState].forward();
-                  pokerGame.revealState++;
-                } else if (pokerGame.revealState == 5) {
+                  _communityCardControllers[revealState].forward();
+                  revealState++;
+                } else if (revealState == 5) {
                   revealAllComputerCards();
+                  revealState++;
+                } else {
+                  resetGameAndDealNewCards();
                 }
               });
+              
             },
           ),
         ],
@@ -357,7 +393,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           int idx = entry.key;
                           var card = entry.value;
                           Widget cardWidget;
-                          if (idx < pokerGame.revealState) {
+                          if (idx < revealState) {
                             cardWidget = CachedNetworkImage(
                               imageUrl: card.image,
                               width: 40,

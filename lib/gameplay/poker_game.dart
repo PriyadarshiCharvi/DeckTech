@@ -17,7 +17,6 @@ class PokerGame {
   List<CardModel> communityCards = [];
   int currentPlayerIndex = 0;
   int potValue = 0;
-  int revealState = 0;
   int prevBet = 0;
 
   PokerGame() {
