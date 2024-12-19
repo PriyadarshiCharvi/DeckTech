@@ -10,17 +10,7 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: const Color.fromARGB(255, 130, 37, 37),
       appBar: AppBar(
         backgroundColor: Colors.transparent, 
-        elevation: 0, 
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.portrait);
-            },
-            icon: const Icon(Icons.logout),
-            color: Colors.red,
-          ),
-          const SizedBox(width: 10), 
-        ],
+        elevation: 0
       ),
       body: SafeArea(
         child: SingleChildScrollView(
