@@ -335,20 +335,19 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                         if (pokerGame.isBettingRoundComplete()) {
                           pokerGame.roundEnd();
                           if (revealState == 0) {
-                            // Reveal the first 3 cards simultaneously
                             for (int i = 0; i < 3; i++) {
                               _communityCardControllers[i].forward();
                             }
-                            revealState = 3;
-                          } else
-                          if (revealState >= 3 && revealState < 5) {
+                            revealState = 3; //FLOP
+                          } else if (revealState >= 3 && revealState < 5) {
                             _communityCardControllers[revealState].forward();
-                            revealState++;
+                            revealState++; //TURN
                           } else if (revealState == 5) {
                             revealAllComputerCards();
-                            revealState++;
+                            revealState++; //RIVER
                           } else {
-                            resetGameAndDealNewCards();
+                            //NEED TO IMPLEMENT SHOWDOWN
+                            resetGameAndDealNewCards(); //ROUND END
                           }
                         } else {
                           pokerGame.nextPlayer();
@@ -595,7 +594,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       Padding(
                         padding: const EdgeInsets.all(3),
                         child: ElevatedButton(
-                          onPressed:(){setState((){onFold;});},
+                          onPressed:(){setState((){onFold();});},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white24,
                             shape: RoundedRectangleBorder(
@@ -613,7 +612,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       Padding(
                         padding: const EdgeInsets.all(3),
                         child: ElevatedButton(
-                          onPressed:(){setState((){onCheck;});},
+                          onPressed:(){setState((){onCheck();});},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white24,
                             shape: RoundedRectangleBorder(
@@ -631,7 +630,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       Padding(
                         padding: const EdgeInsets.all(3),
                         child: ElevatedButton(
-                          onPressed:(){setState((){onCall;});},
+                          onPressed:(){setState((){onCall();});},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white24,
                             shape: RoundedRectangleBorder(
@@ -703,7 +702,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             fixedSize: const Size(107, 50),
                           ),
                           child: const Text(
-                              'POT', style: TextStyle(fontSize: 16,
+                              'RAISE 5', style: TextStyle(fontSize: 16,
                               color: Colors.white, fontWeight: FontWeight.bold)
                           ),
                         ),

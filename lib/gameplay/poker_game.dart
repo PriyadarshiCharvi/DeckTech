@@ -128,22 +128,23 @@ class PokerGame {
   Future<void> raiseH() async{
     int bet = (pot/2).floor();
     PlayerModel player = players[currentPlayerIndex];
-    if ((bet <= player.stack) & (prevBet <= bet)) {
+    if ((bet >= player.stack) || (prevBet > bet)) {
+      print("${player.name} cannot raise half-pot");
+      print("${player.name} is all in");
+      raiseA();
+
+    } else {
       pot += bet;
       player.stack -= bet;
       player.currentRoundBet += bet;
       prevBet = bet;
 
-      print("${player.name} bet half-pot");
+      print("${player.name} raises half-pot");
       print("${player.name} current round bet: ${player.currentRoundBet}");
       print("${player.name} stack: ${player.stack}");
       print("Pot: $pot");
 
       player.actedThisRound = true;
-
-    } else {
-      print("Cannot bet half-pot");
-      if (currentPlayerIndex != 0) computerActions();
     }
   }
 
@@ -178,14 +179,11 @@ class PokerGame {
     player.isAllIn = true;
     player.currentRoundBet += betAmount;
     pot += betAmount;
-    if (betAmount > prevBet) prevBet = betAmount;
 
-    print("${player.name} all in");
+    print("${player.name} is all in");
     print("${player.name} current round bet: ${player.currentRoundBet}");
     print("${player.name} stack: ${player.stack}");
     print("Pot: $pot");
-
-
   }
 
   // Player action: Call
@@ -204,7 +202,6 @@ class PokerGame {
       print("Pot: $pot");
 
     } else {
-      print("${player.name} calls all in");
       raiseA();
     }
   }
