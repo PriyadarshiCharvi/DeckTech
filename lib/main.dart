@@ -1,8 +1,6 @@
 import 'package:decktech/models/orientation_model.dart';
-import 'package:decktech/screens/exit_screen.dart';
 import 'package:decktech/screens/game_screen.dart';
 import 'package:decktech/screens/home_screen.dart';
-import 'package:decktech/screens/login_screen.dart';
 import 'package:decktech/screens/spectate_screen.dart'; 
 import 'package:decktech/screens/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -20,14 +18,7 @@ class DeckTech extends StatelessWidget {
   DeckTech({super.key});
 
   Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
-    if (settings.name == AppRoutes.home) {
-      return MaterialPageRoute(builder: (context) => const ExitScreen());
-    } else if (settings.name == AppRoutes.portrait) {
-      return MaterialPageRoute(
-        builder: (context) => const LoginScreen(),
-        settings: rotationSettings(settings, ScreenOrientation.portraitOnly),
-      );
-    } else if (settings.name == AppRoutes.landscape) {
+    if (settings.name == AppRoutes.landscape) {
       return MaterialPageRoute(
         builder: (context) => const HomeScreen(),
         settings: rotationSettings(settings, ScreenOrientation.landscapeOnly),
@@ -50,7 +41,7 @@ class DeckTech extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const LoginScreen(),
+      home: const HomeScreen(),
       onGenerateRoute: _onGenerateRoute,
       navigatorObservers: [_observer],
     );

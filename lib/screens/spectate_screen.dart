@@ -36,10 +36,10 @@ class _GameScreenState extends State<SpectateScreen> with TickerProviderStateMix
     super.initState();
     pokerGame = PokerGame();
     pokerGame.players = [
-      PlayerModel(name: 'Player', isHuman: true),
-      PlayerModel(name: 'Computer 1'),
-      PlayerModel(name: 'Computer 2'),
-      PlayerModel(name: 'Computer 3'),
+      PlayerModel(name: 'Player', position: 0, isHuman: true),
+      PlayerModel(name: 'Computer 1', position: 1),
+      PlayerModel(name: 'Computer 2', position: 2),
+      PlayerModel(name: 'Computer 3', position: 3),
     ];
 
 
@@ -188,7 +188,7 @@ class _GameScreenState extends State<SpectateScreen> with TickerProviderStateMix
 
   void onRaise1() {
     print('Raise1 button pressed');
-    pokerGame.raiseS();
+    pokerGame.raiseH();
   }
 
   void onRaise2() {
@@ -215,10 +215,10 @@ class _GameScreenState extends State<SpectateScreen> with TickerProviderStateMix
 
       pokerGame = PokerGame();
       pokerGame.players = [
-        PlayerModel(name: 'Player', isHuman: true),
-        PlayerModel(name: 'Computer 1'),
-        PlayerModel(name: 'Computer 2'),
-        PlayerModel(name: 'Computer 3'),
+        PlayerModel(name: 'Player', position: 0, isHuman: true),
+        PlayerModel(name: 'Computer 1', position: 1),
+        PlayerModel(name: 'Computer 2', position: 2),
+        PlayerModel(name: 'Computer 3', position: 3),
       ];
 
       pokerGame.startGame().then((_) {
@@ -348,7 +348,7 @@ class _GameScreenState extends State<SpectateScreen> with TickerProviderStateMix
                     ),
                   Column(
                     children: [
-                      Text('Pot - \$${pokerGame.potValue}',
+                      Text('Pot - \$${pokerGame.pot}',
                           style: const TextStyle(color: Colors.white)),
 
                       Row(

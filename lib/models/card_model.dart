@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
 
-enum Suit {
-  Hearts,
-  Clubs,
-  Diamonds,
-  Spades,
-  Other,
-}
-
 class CardModel {
   final String image;
-  final Suit suit;
+  final String suit;
   final String value;
 
   CardModel({
@@ -20,69 +12,73 @@ class CardModel {
   });
 
   factory CardModel.fromJson(Map<String, dynamic> json) {
-  return CardModel(
-    image: json['image'] ?? '', // Ensure to handle nullability
-    suit: stringToSuit(json['suit'] ?? ''), // Convert suit string to enum
-    value: json['value'] ?? '', // Ensure to handle nullability
-  );
-}
-
-
-  static Suit stringToSuit(String? suit) {
-    switch (suit?.toUpperCase().trim()) {
-      case "HEARTS":
-        return Suit.Hearts;
-      case "CLUBS":
-        return Suit.Clubs;
-      case "DIAMONDS":
-        return Suit.Diamonds;
-      case "SPADES":
-        return Suit.Spades;
-      default:
-        return Suit.Other;
-    }
+    return CardModel(
+      image: json['image'] ?? '', // Ensure to handle nullability
+      suit: json['suit'] ?? '', // Convert suit string to enum
+      value: json['value'] ?? '', // Ensure to handle nullability
+    );
   }
 
-  static String suitToString(Suit suit) {
-    switch (suit) {
-      case Suit.Hearts:
-        return "Hearts";
-      case Suit.Clubs:
-        return "Clubs";
-      case Suit.Diamonds:
-        return "Diamonds";
-      case Suit.Spades:
-        return "Spades";
-      case Suit.Other:
-        return "Other";
-    }
+  @override
+  toString() {
+    return ("$value of $suit");
   }
 
-  static String suitToUnicode(Suit suit) {
+
+  // static Suit stringToSuit(String? suit) {
+  //   switch (suit?.toUpperCase().trim()) {
+  //     case "HEARTS":
+  //       return Suit.Hearts;
+  //     case "CLUBS":
+  //       return Suit.Clubs;
+  //     case "DIAMONDS":
+  //       return Suit.Diamonds;
+  //     case "SPADES":
+  //       return Suit.Spades;
+  //     default:
+  //       throw "ERROR";
+  //   }
+  // }
+
+  // static String suitToString(Suit suit) {
+  //   switch (suit) {
+  //     case Suit.Hearts:
+  //       return "Hearts";
+  //     case Suit.Clubs:
+  //       return "Clubs";
+  //     case Suit.Diamonds:
+  //       return "Diamonds";
+  //     case Suit.Spades:
+  //       return "Spades";
+  //   }
+  // }
+
+  static String suitToUnicode(String suit) {
     switch (suit) {
-      case Suit.Hearts:
+      case "Hearts":
         return "\u2665";
-      case Suit.Clubs:
+      case "Clubs":
         return "\u2663";
-      case Suit.Diamonds:
+      case "Diamonds":
         return "\u2666";
-      case Suit.Spades:
+      case "Spades":
         return "\u2660";
-      case Suit.Other:
-        return "Other";
+      default:
+        throw "ERROR";
     }
   }
 
-  static Color suitToColor(Suit suit) {
+  static Color suitToColor(String suit) {
     switch (suit) {
-      case Suit.Hearts:
-      case Suit.Diamonds:
+      case "Hearts":
+      case "Diamonds":
         return Colors.red;
-      case Suit.Clubs:
-      case Suit.Spades:
-      case Suit.Other:
+      case "Clubs":
+      case "Spades":
         return Colors.black;
+      default:
+        throw "ERROR";
     }
   }
-}
 
+}

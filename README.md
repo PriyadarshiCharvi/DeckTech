@@ -63,7 +63,7 @@ We hope to develop a poker mobile application with a wide range of features and 
 - Flutter: For cross-platform mobile app development, providing a unified codebase for iOS and Android platforms, efficient performance, and a rich set of customizable UI components
   - Flutter Widgets: For visually appealing user interfaces
   - Flutter Testing Framework: For reliable widget and integration tests
-- WebSockets: To enable real time two-way communication, facilitating multiplayer gamplay
+- WebSockets: To enable real time two-way communication, facilitating multiplayer gameplay
 - Firebase: For backend services such as user authentication, real-time database, and cloud storage, offering scalability, reliability and seamless integration with the frontend.
   - Cloud Firestore: For storing game data, user profiles and game state in real-time to enable multiplayer gameplay
 - REST APIs: For accessing services allowing for data retrieval, storage and manipulation
