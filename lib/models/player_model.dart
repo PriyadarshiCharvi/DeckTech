@@ -12,11 +12,13 @@ class PlayerModel {
   bool actedThisRound;
   List<CardModel> cards;
   bool showCards;
+  int position;
 
   PlayerModel({
     required this.name,
+    required this.position,
     this.currentRoundBet = 0,
-    this.stack = 500,
+    this.stack = 100,
     this.hasFolded = false,
     this.isAllIn = false,
     this.isHuman = false,
