@@ -229,7 +229,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     if (pokerGame.currentPlayerIndex != 0) {
       print("It is not your turn");
     } else {
-      pokerGame.call();
+      pokerGame.callLogic();
     }
   }
 
@@ -362,14 +362,16 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           if (revealState == 0) {
                             for (int i = 0; i < 3; i++) {
                               _communityCardControllers[i].forward();
+                              print("------ACTION ON YOU------");
                             }
                             revealState = 3; //FLOP
                           } else if (revealState >= 3 && revealState < 5) {
                             _communityCardControllers[revealState].forward();
-                            revealState++; //TURN
+                            revealState++; //TURN AND RIVER
+                            print("------ACTION ON YOU------");
                           } else if (revealState == 5) {
                             revealAllComputerCards();
-                            revealState++; //RIVER
+                            revealState++; //SHOWDOWN
                           } else {
                             //NEED TO IMPLEMENT SHOWDOWN
                             resetGameAndDealNewCards(); //ROUND END

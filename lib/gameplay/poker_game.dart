@@ -33,16 +33,18 @@ class PokerGame {
       for (PlayerModel player in players) {
         DrawModel draw = await deckService.drawCards(deck, count: 2);
         player.cards = draw.cards;
-        print("${player.name} hand: ${player.cards[0].toString()}, ${player.cards[1].toString()}");
+        //print("${player.name} hand: ${player.cards[0].toString()}, ${player.cards[1].toString()}");
       }
 
       DrawModel draw = await deckService.drawCards(deck, count: 5);
       communityCards = draw.cards;
 
       if (kDebugMode) {
-        print("Community cards: ${communityCards[0].toString()}, ${communityCards[1].toString()}, "
-            "${communityCards[2].toString()}, ${communityCards[3].toString()}, ${communityCards[4].toString()}");
+        //print("Community cards: ${communityCards[0].toString()}, ${communityCards[1].toString()}, "
+        //    "${communityCards[2].toString()}, ${communityCards[3].toString()}, ${communityCards[4].toString()}");
       }
+
+      print("------ACTION ON YOU------");
 
     } catch (e) {
       if (kDebugMode) {
@@ -71,7 +73,7 @@ class PokerGame {
     int validAction = 0;
     for (var playerIndex = 0; playerIndex < 6; playerIndex++) {
       PlayerModel player = players[playerIndex];
-      if (!player.actedThisRound) return false;
+      if (!player.actedThisRound) {return false;}
       if (player.hasFolded) {validAction += 1;}
       else if (player.isAllIn) {validAction += 1;}
       else if (player.currentRoundBet == roundBet) {validAction += 1;}
@@ -85,7 +87,9 @@ class PokerGame {
     for (int playerIndex = 0; playerIndex < 6; playerIndex++) {
       PlayerModel player = players[playerIndex];
       player.currentRoundBet = 0;
-      player.actedThisRound = false;
+      if (!player.isAllIn && !player.hasFolded) {
+        player.actedThisRound = false;
+      }
       if (!player.hasFolded) playerCounter += 1;
     }
     roundBet = 0;
@@ -167,8 +171,23 @@ class PokerGame {
     player.actedThisRound = true;
   }
 
-  // Player action: Call
   Future<void> call() async{
+    int bet = roundBet;
+    PlayerModel player = players[currentPlayerIndex];
+    pot += bet;
+    player.stack -= bet;
+    player.currentRoundBet += bet;
+    roundBet = bet;
+    //PRINTS AND INDICATIONS
+    print("${player.name} calls");
+    print("${player.name} current round bet: ${player.currentRoundBet}");
+    print("${player.name} stack: ${player.stack}");
+    print("Pot: $pot");
+    player.actedThisRound = true;
+  }
+
+  // Player action: Call
+  Future<void> callLogic() async{
     int bet = roundBet;
     PlayerModel player = players[currentPlayerIndex];
     if (bet == 0) {
@@ -182,16 +201,7 @@ class PokerGame {
       if ((bet >= player.stack)) { //STACK TOO SMALL
         raiseAllIn();
       } else {
-        pot += bet;
-        player.stack -= bet;
-        player.currentRoundBet += bet;
-        roundBet = bet;
-        //PRINTS AND INDICATIONS
-        print("${player.name} calls");
-        print("${player.name} current round bet: ${player.currentRoundBet}");
-        print("${player.name} stack: ${player.stack}");
-        print("Pot: $pot");
-        player.actedThisRound = true;
+        call();
       }
     }
   }
@@ -240,7 +250,7 @@ class PokerGame {
     } else {
       var rand = random(0, 100);
       if (rand < 40) {
-        call();
+        callLogic();
       }
       else if (rand < 60) {
         raise5();
