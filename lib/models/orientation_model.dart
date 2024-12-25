@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
 // Orientation options
-// Extend it and handle more options, if you need them
 enum ScreenOrientation {
   portraitOnly,
   landscapeOnly,

@@ -19,7 +19,7 @@ class PokerGame {
   List<CardModel> communityCards = [];
   int currentPlayerIndex = 0;
   int pot = 0;
-  int prevBet = 0;
+  int roundBet = 0;
 
   PokerGame() {
     deckService = DeckService();
@@ -55,168 +55,164 @@ class PokerGame {
   }
 
   //Next player action handler
-  int nextPlayer() {
+  void nextPlayer() {
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-
     if (currentPlayerIndex != 0) {
       computerActions();
-      return 0;
     } else {
       if (players[0].hasFolded) {
         print("You have folded");
-        nextPlayer();
+        print("Press next");
       } else if (players[0].isAllIn) {
         print("You are all in");
-        nextPlayer();
+        print("Press next");
+      } else {
+        print("------ACTION ON YOU------");
       }
-      print("------ACTION ON YOU------");
-      return 1;
     }
   }
 
-  //Check if betting round is complete
+  // Check if betting round is complete
   bool isBettingRoundComplete() {
-    var standard = 0;
-    int counter = 0;
-    int tempWinningPlayer = 0;
-
+    int validAction = 0;
     for (var playerIndex = 0; playerIndex < 6; playerIndex++) {
-      if (players[playerIndex].hasFolded) {
-        counter += 1;
-      } else {
-        tempWinningPlayer = playerIndex;
-        if (!players[playerIndex].isAllIn) {
-          standard = players[playerIndex].currentRoundBet;
-        }
-      }
+      PlayerModel player = players[playerIndex];
+      if (!player.actedThisRound) return false;
+      if (player.hasFolded) {validAction += 1;}
+      else if (player.isAllIn) {validAction += 1;}
+      else if (player.currentRoundBet == roundBet) {validAction += 1;}
     }
-
-    //All other players fold
-    if (counter == 5) {
-      winner(tempWinningPlayer);
-    }
-    /*
-    for (var playerIndex = 0; playerIndex < 4; playerIndex++) {
-      if (!players[playerIndex].hasFolded && !players[playerIndex].isAllIn) {
-        standard = players[playerIndex].currentRoundBet;
-        break;
-      }
-    }
-     */
-
-    for (var playerIndex = 0; playerIndex < 6; playerIndex++) {
-      if (!players[playerIndex].actedThisRound || ((!players[playerIndex].hasFolded) && players[playerIndex].currentRoundBet != standard && !players[playerIndex].isAllIn)) {
-        return false;
-      }
-    }
-    return true;
+    return (validAction == 6);
   }
 
   // Round end
   Future<void> roundEnd() async{
-      for (int playerIndex = 0; playerIndex < 6; playerIndex++) {
-        players[playerIndex].currentRoundBet = 0;
-        players[playerIndex].actedThisRound = false;
-      }
-      prevBet = 0;
-      print("------BETTING ROUND COMPLETE------");
-      print("------PRESS ARROW ON TOP RIGHT------");
-      return;
+    int playerCounter = 0;
+    for (int playerIndex = 0; playerIndex < 6; playerIndex++) {
+      PlayerModel player = players[playerIndex];
+      player.currentRoundBet = 0;
+      player.actedThisRound = false;
+      if (!player.hasFolded) playerCounter += 1;
+    }
+    roundBet = 0;
+    print("-------------BETTING ROUND COMPLETE-------------");
+    print("------PRESS NEXT TO ADVANCE TO NEXT STREET------");
+    print("-------------------$playerCounter PLAYERS--------------------");
+    return;
   }
 
-  // Player action: Bet half-pot
-  Future<void> raiseH() async{
-    int bet = (pot/2).floor();
+  // Player action: Raise by 5
+  Future<void> raise5() async{
+    int bet = 5 + roundBet;
     PlayerModel player = players[currentPlayerIndex];
-    if ((bet >= player.stack) || (prevBet > bet)) {
-      print("${player.name} cannot raise half-pot");
-      print("${player.name} is all in");
-      raiseA();
-
+    if (player.actedThisRound) { //RETRACTING PREVIOUS BET
+      pot -= player.currentRoundBet;
+      player.stack += player.currentRoundBet;
+      player.currentRoundBet = 0;
+    }
+    if ((bet >= player.stack)) { //STACK TOO SMALL
+      print("${player.name}'s stack not big enough to raise by 5");
+      raiseAllIn();
     } else {
       pot += bet;
       player.stack -= bet;
       player.currentRoundBet += bet;
-      prevBet = bet;
-
-      print("${player.name} raises half-pot");
+      roundBet = bet;
+      //PRINTS AND INDICATIONS
+      print("${player.name} raises by 5");
       print("${player.name} current round bet: ${player.currentRoundBet}");
       print("${player.name} stack: ${player.stack}");
       print("Pot: $pot");
-
       player.actedThisRound = true;
     }
   }
 
-  // Player action: Raise by 5
-  Future<void> raiseP() async{
-    int betAmount = 5 + prevBet;
+  // Player action: Raise by 20
+  Future<void> raise20() async{
+    int bet = 20 + roundBet;
     PlayerModel player = players[currentPlayerIndex];
-    if (betAmount <= player.stack) {
-      player.actedThisRound = true;
-      pot += betAmount - player.currentRoundBet;
-      player.stack -= betAmount - player.currentRoundBet;
-      player.currentRoundBet = betAmount;
-      prevBet += 5;
-
-      print("${player.name} raise 5");
+    if (player.actedThisRound) { //RETRACTING PREVIOUS BET
+      pot -= player.currentRoundBet;
+      player.stack += player.currentRoundBet;
+      player.currentRoundBet = 0;
+    }
+    if ((bet >= player.stack)) { //STACK TOO SMALL
+      print("${player.name}'s stack not big enough to raise by 20");
+      raiseAllIn();
+    } else {
+      pot += bet;
+      player.stack -= bet;
+      player.currentRoundBet += bet;
+      roundBet = bet;
+      //PRINTS AND INDICATIONS
+      print("${player.name} raises by 20");
       print("${player.name} current round bet: ${player.currentRoundBet}");
       print("${player.name} stack: ${player.stack}");
       print("Pot: $pot");
-
-    } else {
-      print("Cannot Raise 5");
-      if (currentPlayerIndex != 0) computerActions();
+      player.actedThisRound = true;
     }
   }
 
   // Player action: All in
-  Future<void> raiseA() async{
+  Future<void> raiseAllIn() async{
     PlayerModel player = players[currentPlayerIndex];
-    int betAmount = player.stack;
-    player.actedThisRound = true;
+    int bet = player.stack + player.currentRoundBet;
     player.stack = 0;
     player.isAllIn = true;
-    player.currentRoundBet += betAmount;
-    pot += betAmount;
+    pot += bet - player.currentRoundBet;
+    player.currentRoundBet = bet;
 
+    if (bet > roundBet) {
+      roundBet = bet;
+    }
+    //PRINTS AND INDICATIONS
     print("${player.name} is all in");
     print("${player.name} current round bet: ${player.currentRoundBet}");
     print("${player.name} stack: ${player.stack}");
     print("Pot: $pot");
+    player.actedThisRound = true;
   }
 
   // Player action: Call
   Future<void> call() async{
+    int bet = roundBet;
     PlayerModel player = players[currentPlayerIndex];
-    if (prevBet <= player.stack) {
-      int bet = prevBet - player.currentRoundBet;
-      player.actedThisRound = true;
-      player.currentRoundBet = prevBet;
-      pot += bet;
-      player.stack -= bet;
-
-      print("${player.name} calls");
-      print("${player.name} current round bet: ${player.currentRoundBet}");
-      print("${player.name} stack: ${player.stack}");
-      print("Pot: $pot");
-
+    if (bet == 0) {
+      check();
     } else {
-      raiseA();
+      if (player.actedThisRound) { //RETRACTING PREVIOUS BET
+        pot -= player.currentRoundBet;
+        player.stack += player.currentRoundBet;
+        player.currentRoundBet = 0;
+      }
+      if ((bet >= player.stack)) { //STACK TOO SMALL
+        print("${player.name} calls all in");
+        raiseAllIn();
+      } else {
+        pot += bet;
+        player.stack -= bet;
+        player.currentRoundBet += bet;
+        roundBet = bet;
+        //PRINTS AND INDICATIONS
+        print("${player.name} calls");
+        print("${player.name} current round bet: ${player.currentRoundBet}");
+        print("${player.name} stack: ${player.stack}");
+        print("Pot: $pot");
+        player.actedThisRound = true;
+      }
     }
   }
 
   // Player action: Check
   Future<void> check() async{
     PlayerModel player = players[currentPlayerIndex];
-    if (prevBet == 0) {
-      player.actedThisRound = true;
-
-      print("${player.name} check");
+    if (roundBet == 0) {
+      //PRINTS AND INDICATIONS
+      print("${player.name} checks");
       print("${player.name} current round bet: ${player.currentRoundBet}");
       print("${player.name} stack: ${player.stack}");
       print("Pot: $pot");
-
+      player.actedThisRound = true;
     } else {
       print("Cannot Check");
       if (currentPlayerIndex != 0) computerActions();
@@ -226,16 +222,13 @@ class PokerGame {
   // Player action: Fold
   Future<void> fold() async{
     PlayerModel player = players[currentPlayerIndex];
-    player.actedThisRound = true;
     player.hasFolded = true;
-
-    print("${player.name} fold");
+    //PRINTS AND INDICATIONS
+    print("${player.name} folds");
     print("${player.name} current round bet: ${player.currentRoundBet}");
     print("${player.name} stack: ${player.stack}");
     print("Pot: $pot");
-
-    player.currentRoundBet = prevBet;
-
+    player.actedThisRound = true;
   }
 
   //Initialize random number generator
@@ -245,34 +238,37 @@ class PokerGame {
 
   //Computer action
   Future<void> computerActions() async{
-
-    print("------${players[currentPlayerIndex].name} Action------");
+    print("------${players[currentPlayerIndex].name} ACTION------");
 
     if (players[currentPlayerIndex].hasFolded) {
       print("${players[currentPlayerIndex].name} has folded");
-      nextPlayer();
-    }
-
-    if (players[currentPlayerIndex].isAllIn) {
+    } else if (players[currentPlayerIndex].isAllIn) {
       print("${players[currentPlayerIndex].name} is all in");
-      nextPlayer();
+    } else {
+      var rand = random(0, 100);
+      if (rand < 40) {
+        call();
+      }
+      else if (rand < 60) {
+        raise5();
+      }
+      else if (rand < 78) {
+        raise20();
+      }
+      else if (rand < 85) {
+        raiseAllIn();
+      }
+      else {
+        fold();
+      }
     }
-
-    var rand = random(0, 100);
-
-    if (rand < 40) {call();}
-    else if (rand < 72) {raiseH();}
-    else if (rand < 85) {raiseP();}
-    else if (rand < 75) {raiseA();}
-    else {fold();}
-
   }
 
   //Declare winner
-  Future<void> winner(int i) async{
+  Future<void> winner(int playerIndex) async{
     //TODO - other win conditions
-    print("${players[i].name} IS THE ONLY REMAINING PLAYER");
-    print("${players[i].name} WINS THE GAME");
+    print("${players[playerIndex].name} IS THE ONLY REMAINING PLAYER");
+    print("${players[playerIndex].name} WINS THE GAME");
     roundEnd();
   }
 
