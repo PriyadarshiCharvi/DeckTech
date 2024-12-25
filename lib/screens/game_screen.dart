@@ -270,9 +270,19 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     });
   }
 
-   int revealState = 0;
+  void hideAllComputerCards() {
+    setState(() {
+      for (var player in pokerGame.players) {
+        if (!player.isHuman) {
+          player.showCards = false;
+        }
+      }
+    });
+  }
 
-   void resetGameAndDealNewCards() {
+  int revealState = 0;
+
+  void resetGameAndDealNewCards() {
     setState(() {
       for (var controller in _communityCardControllers) {
         controller.reset();
@@ -285,16 +295,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       _player3CardController?.reset();
       _player4CardController?.reset();
       _player5CardController?.reset();
-
-      // pokerGame = PokerGame();
-      // pokerGame.players = [
-      //   PlayerModel(name: 'Player', position: 0, isHuman: true),
-      //   PlayerModel(name: 'COM 1', position: 1),
-      //   PlayerModel(name: 'COM 2', position: 2),
-      //   PlayerModel(name: 'COM 3', position: 3),
-      //   PlayerModel(name: 'COM 4', position: 4),
-      //   PlayerModel(name: 'COM 5', position: 5),
-      // ];
+      hideAllComputerCards();
 
       pokerGame.startGame().then((_) {
         revealState = 0;

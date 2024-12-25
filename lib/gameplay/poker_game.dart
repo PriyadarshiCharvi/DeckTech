@@ -28,17 +28,14 @@ class PokerGame {
 
   Future<void> startGame() async {
     try {
-      print("Fetching new deck...");
       deck = await deckService.newDeck();
 
       for (PlayerModel player in players) {
-        print("Drawing cards for ${player.name}:");
         DrawModel draw = await deckService.drawCards(deck, count: 2);
         player.cards = draw.cards;
         print("${player.name} hand: ${player.cards[0].toString()}, ${player.cards[1].toString()}");
       }
 
-      print("Drawing community cards...");
       DrawModel draw = await deckService.drawCards(deck, count: 5);
       communityCards = draw.cards;
 
@@ -60,14 +57,11 @@ class PokerGame {
     if (currentPlayerIndex != 0) {
       computerActions();
     } else {
+      print("------ACTION ON YOU------");
       if (players[0].hasFolded) {
         print("You have folded");
-        print("Press next");
       } else if (players[0].isAllIn) {
         print("You are all in");
-        print("Press next");
-      } else {
-        print("------ACTION ON YOU------");
       }
     }
   }
@@ -186,7 +180,6 @@ class PokerGame {
         player.currentRoundBet = 0;
       }
       if ((bet >= player.stack)) { //STACK TOO SMALL
-        print("${player.name} calls all in");
         raiseAllIn();
       } else {
         pot += bet;
