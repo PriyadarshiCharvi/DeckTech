@@ -24,35 +24,6 @@ class CardModel {
     return ("$value of $suit");
   }
 
-
-  // static Suit stringToSuit(String? suit) {
-  //   switch (suit?.toUpperCase().trim()) {
-  //     case "HEARTS":
-  //       return Suit.Hearts;
-  //     case "CLUBS":
-  //       return Suit.Clubs;
-  //     case "DIAMONDS":
-  //       return Suit.Diamonds;
-  //     case "SPADES":
-  //       return Suit.Spades;
-  //     default:
-  //       throw "ERROR";
-  //   }
-  // }
-
-  // static String suitToString(Suit suit) {
-  //   switch (suit) {
-  //     case Suit.Hearts:
-  //       return "Hearts";
-  //     case Suit.Clubs:
-  //       return "Clubs";
-  //     case Suit.Diamonds:
-  //       return "Diamonds";
-  //     case Suit.Spades:
-  //       return "Spades";
-  //   }
-  // }
-
   static String suitToUnicode(String suit) {
     switch (suit) {
       case "Hearts":

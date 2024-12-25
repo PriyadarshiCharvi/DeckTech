@@ -183,22 +183,22 @@ class _GameScreenState extends State<SpectateScreen> with TickerProviderStateMix
 
   void onCall() {
     print('Call button pressed');
-    pokerGame.call();
+    pokerGame.callLogic();
   }
 
   void onRaise1() {
     print('Raise1 button pressed');
-    pokerGame.raiseH();
+    pokerGame.raise5();
   }
 
   void onRaise2() {
     print('Raise2 button pressed');
-    pokerGame.raiseP();
+    pokerGame.raise20();
   }
 
   void onRaise3() {
     print('Raise3 button pressed');
-    pokerGame.raiseA();
+    pokerGame.raiseAllIn();
   }
 
   void resetGameAndDealNewCards() {
