@@ -263,9 +263,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   void revealAllComputerCards() {
     setState(() {
       for (var player in pokerGame.players) {
-        if (!player.isHuman) {
-          player.showCards = true;
-        }
+        if (!player.isHuman) {player.showCards = true;}
       }
     });
   }
@@ -273,9 +271,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   void hideAllComputerCards() {
     setState(() {
       for (var player in pokerGame.players) {
-        if (!player.isHuman) {
-          player.showCards = false;
-        }
+        if (!player.isHuman) {player.showCards = false;}
       }
     });
   }
@@ -333,9 +329,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 Padding(
                   padding: const EdgeInsets.all(6),
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                    onPressed: () {Navigator.pop(context);},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white24,
                       shape: RoundedRectangleBorder(
@@ -343,12 +337,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       ),
                       fixedSize: const Size(90, 36),
                     ),
-                    child: const Text(
-                        'EXIT', style: TextStyle(fontSize: 14,
-                        color: Colors.white,
-                        //fontWeight: FontWeight.bold
-                    )
-                    ),
+                    child: const Text('EXIT', style: TextStyle(fontSize: 14, color: Colors.white)),
                   ),
                 ),
 
@@ -359,22 +348,36 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       setState(() {
                         if (pokerGame.isBettingRoundComplete()) {
                           pokerGame.roundEnd();
-                          if (revealState == 0) {
-                            for (int i = 0; i < 3; i++) {
-                              _communityCardControllers[i].forward();
-                              print("------ACTION ON YOU------");
-                            }
-                            revealState = 3; //FLOP
-                          } else if (revealState >= 3 && revealState < 5) {
-                            _communityCardControllers[revealState].forward();
-                            revealState++; //TURN AND RIVER
-                            print("------ACTION ON YOU------");
-                          } else if (revealState == 5) {
-                            revealAllComputerCards();
-                            revealState++; //SHOWDOWN
-                          } else {
-                            //NEED TO IMPLEMENT SHOWDOWN
-                            resetGameAndDealNewCards(); //ROUND END
+                          switch(revealState) {
+                            case 0: //FLOP
+                              for (int i = 0; i < 3; i++) {_communityCardControllers[i].forward();}
+                              revealState = 3;
+                              print("-----------------ACTION ON YOU------------------");
+                            case 3: //TURN
+                            case 4: //RIVER
+                              _communityCardControllers[revealState].forward();
+                              revealState++;
+                              print("-----------------ACTION ON YOU------------------");
+                            case 5: //REVEAL COM CARDS
+                              revealAllComputerCards();
+                              revealState++;
+                            case 6: //SHOWDOWN
+                              List<PlayerModel> playersInHand = [];
+                              for (PlayerModel player in pokerGame.players) {
+                                if (!player.hasFolded) {
+                                  playersInHand.add(player);
+                                }
+                              }
+                              List winners = pokerGame.getWinningPlayers(playersInHand);
+                              if (winners.length > 1) { // MULTIPLE WINNERS
+                                pokerGame.splitPot(winners, playersInHand);
+                              } else { //SINGLE WINNER
+                                playersInHand[winners[0]].stack += pokerGame.pot;
+                              }
+                              pokerGame.pot = 0;
+                              revealState++;
+                            case 7: //RESET ROUND
+                              resetGameAndDealNewCards();
                           }
                         } else {
                           pokerGame.nextPlayer();
@@ -388,15 +391,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       ),
                       fixedSize: const Size(90, 36),
                     ),
-                    child: const Text(
-                        'NEXT', style: TextStyle(fontSize: 14,
-                      color: Colors.white,
-                      //fontWeight: FontWeight.bold
-                    )
-                    ),
+                    child: const Text('NEXT', style: TextStyle(fontSize: 14, color: Colors.white)),
                   ),
                 ),
-
             ]),
           ),
 
@@ -407,7 +404,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
 
-              // PLAYER 2 (above community cards)
+              // PLAYER 2, PLAYER 3 and PLAYER 4 (above community cards)
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -439,7 +436,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       ],
                     ),
 
-                  // PLAYER 3 (top of community cards)
+                  // PLAYER 3 (above community cards)
 
                   if (_player3CardAnimation != null)
                     Column(
@@ -556,7 +553,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           } else {
                             cardWidget = const Image(image: AssetImage('assets/card_back.png'), width: 50, height: 75);
                           }
-
                           return SlideTransition(
                             position: _communityCardAnimations[idx],
                             child: Padding(
@@ -564,7 +560,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                               child: cardWidget,
                             ),
                           );
-
                         }).toList(),
                       ),
                     ],
@@ -679,12 +674,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           alignment: Alignment.center,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: pokerGame.players
-                                .firstWhere((player) => player.isHuman)
-                                .cards
-                                .asMap()
-                                .entries
-                                .map((entry) {
+                            children: pokerGame.players[0].cards
+                                .asMap().entries.map((entry) {
                               int idx = entry.key;
                               var card = entry.value;
                               return SlideTransition(
@@ -752,7 +743,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           ),
                         ),
                       ),
-
                     ],
                   ),
                 ],
