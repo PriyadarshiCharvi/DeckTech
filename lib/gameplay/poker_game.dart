@@ -12,6 +12,8 @@ import 'package:decktech/screens/deck_service.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:math';
 
+import 'package:poker/poker.dart';
+
 class PokerGame {
   List<PlayerModel> players = [];
   late DeckService deckService;
@@ -44,7 +46,7 @@ class PokerGame {
         //    "${communityCards[2].toString()}, ${communityCards[3].toString()}, ${communityCards[4].toString()}");
       }
 
-      print("------ACTION ON YOU------");
+      print("-----------------ACTION ON YOU------------------");
 
     } catch (e) {
       if (kDebugMode) {
@@ -248,6 +250,7 @@ class PokerGame {
     } else if (players[currentPlayerIndex].isAllIn) {
       print("${players[currentPlayerIndex].name} is all in");
     } else {
+      // RANDOMIZER
       var rand = random(0, 100);
       if (rand < 40) {
         callLogic();
@@ -267,12 +270,25 @@ class PokerGame {
     }
   }
 
-  //Declare winner
-  Future<void> winner(int playerIndex) async{
-    //TODO - other win conditions
-    print("${players[playerIndex].name} IS THE ONLY REMAINING PLAYER");
-    print("${players[playerIndex].name} WINS THE GAME");
-    roundEnd();
+  //Return index of winning player/s at showdown
+  List getWinningPlayers(playersInHand) {
+    List<CardPair> playerCardPairs = [];
+    for (PlayerModel player in playersInHand) {
+      playerCardPairs.add(CardPair.parse("${player.cards[0].getCode()}${player.cards[1].getCode()}"));
+    }
+    String communityCardsString = ("${communityCards[0].getCode()}${communityCards[1].getCode()}"
+        "${communityCards[2].getCode()}${communityCards[3].getCode()}${communityCards[4].getCode()}");
+    ImmutableCardSet communityCardsList =  ImmutableCardSet.parse(communityCardsString);
+    Matchup match = Matchup.showdown(playerCardPairs: playerCardPairs, communityCards: communityCardsList);
+    return match.wonPlayerIndexes.toList();
   }
 
+  //Splits pot between multiple winners
+  splitPot(List listOfWinners, playersInHand) {
+    int numberOfWinners = listOfWinners.length;
+    int individualWinnings = (pot/numberOfWinners).floor();
+    for (int playerIndex in listOfWinners) {
+      playersInHand[playerIndex].stack += individualWinnings;
+    }
+  }
 }
