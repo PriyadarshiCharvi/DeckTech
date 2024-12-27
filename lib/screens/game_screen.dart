@@ -370,13 +370,19 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             case 6: //SHOWDOWN
                               List<PlayerModel> playersInHand = [];
                               for (PlayerModel player in pokerGame.players) {
-                                if (!player.hasFolded) {playersInHand.add(player);}
+                                if (!(player.hasFolded || (player.stack == 0 && !player.isAllIn))) {
+                                  playersInHand.add(player);
+                                }
                               }
-                              List winners = pokerGame.getWinningPlayers(playersInHand);
-                              if (winners.length > 1) { // MULTIPLE WINNERS
-                                pokerGame.splitPot(winners, playersInHand);
-                              } else { //SINGLE WINNER
-                                playersInHand[winners[0]].stack += pokerGame.pot;
+                              if (playersInHand.length == 1) { //SINGLE PLAYER LEFT
+                                playersInHand[0].stack += pokerGame.pot;
+                              } else { //MULTIPLE PLAYERS LEFT
+                                List winners = pokerGame.getWinningPlayers(playersInHand);
+                                if (winners.length > 1) { // MULTIPLE WINNERS
+                                  pokerGame.splitPot(winners, playersInHand);
+                                } else { //SINGLE WINNER
+                                  playersInHand[winners[0]].stack += pokerGame.pot;
+                                }
                               }
                               pokerGame.pot = 0;
                               revealState++;
