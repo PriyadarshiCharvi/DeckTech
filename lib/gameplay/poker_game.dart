@@ -64,23 +64,24 @@ class PokerGame {
       print("------ACTION ON YOU------");
       if (players[0].hasFolded) {
         print("You have folded");
+        nextPlayer();
       } else if (players[0].isAllIn) {
         print("You are all in");
+        nextPlayer();
       }
     }
   }
 
   // Check if betting round is complete
   bool isBettingRoundComplete() {
-    int validAction = 0;
-    for (var playerIndex = 0; playerIndex < 6; playerIndex++) {
-      PlayerModel player = players[playerIndex];
-      if (!player.actedThisRound) {return false;}
-      if (player.hasFolded) {validAction += 1;}
-      else if (player.isAllIn) {validAction += 1;}
-      else if (player.currentRoundBet == roundBet) {validAction += 1;}
+    for (PlayerModel player in players) {
+      if (!player.hasFolded && !player.isAllIn && player.stack != 0) {
+        if (player.actedThisRound) {
+          if (player.currentRoundBet != roundBet) {return false;}
+        } else {return false;}
+      }
     }
-    return (validAction == 6);
+    return true;
   }
 
   // Round end
@@ -192,9 +193,8 @@ class PokerGame {
   Future<void> callLogic() async{
     int bet = roundBet;
     PlayerModel player = players[currentPlayerIndex];
-    if (bet == 0) {
-      check();
-    } else {
+    if (bet == 0) {check();}
+    else {
       if (player.actedThisRound) { //RETRACTING PREVIOUS BET
         pot -= player.currentRoundBet;
         player.stack += player.currentRoundBet;
@@ -202,9 +202,7 @@ class PokerGame {
       }
       if ((bet >= player.stack)) { //STACK TOO SMALL
         raiseAllIn();
-      } else {
-        call();
-      }
+      } else {call();}
     }
   }
 
@@ -220,7 +218,7 @@ class PokerGame {
       player.actedThisRound = true;
     } else {
       print("Cannot Check");
-      if (currentPlayerIndex != 0) computerActions();
+      if (currentPlayerIndex != 0) {computerActions();}
     }
   }
 
@@ -247,26 +245,21 @@ class PokerGame {
 
     if (players[currentPlayerIndex].hasFolded) {
       print("${players[currentPlayerIndex].name} has folded");
+      nextPlayer();
     } else if (players[currentPlayerIndex].isAllIn) {
       print("${players[currentPlayerIndex].name} is all in");
+      nextPlayer();
+    } else if (players[currentPlayerIndex].stack == 0) {
+      print("${players[currentPlayerIndex].name} has no money left");
+      nextPlayer();
     } else {
       // RANDOMIZER
       var rand = random(0, 100);
-      if (rand < 40) {
-        callLogic();
-      }
-      else if (rand < 60) {
-        raise5();
-      }
-      else if (rand < 78) {
-        raise20();
-      }
-      else if (rand < 85) {
-        raiseAllIn();
-      }
-      else {
-        fold();
-      }
+      if (rand < 40) {callLogic();}
+      else if (rand < 60) {raise5();}
+      else if (rand < 78) {raise20();}
+      else if (rand < 85) {raiseAllIn();}
+      else {fold();}
     }
   }
 

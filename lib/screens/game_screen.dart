@@ -293,6 +293,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       _player5CardController?.reset();
       hideAllComputerCards();
 
+      for (PlayerModel player in pokerGame.players) {
+        player.actedThisRound = false;
+        player.hasFolded = false;
+        player.isAllIn = false;
+      }
+
       pokerGame.startGame().then((_) {
         revealState = 0;
         _startAnimations();
@@ -364,9 +370,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             case 6: //SHOWDOWN
                               List<PlayerModel> playersInHand = [];
                               for (PlayerModel player in pokerGame.players) {
-                                if (!player.hasFolded) {
-                                  playersInHand.add(player);
-                                }
+                                if (!player.hasFolded) {playersInHand.add(player);}
                               }
                               List winners = pokerGame.getWinningPlayers(playersInHand);
                               if (winners.length > 1) { // MULTIPLE WINNERS
@@ -417,8 +421,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       children: [
                         Text(
                           'COM 2: \$${pokerGame.players[2].stack}',
-                          style: const TextStyle(fontSize: 17, color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                          style: (pokerGame.currentPlayerIndex == 2)
+                              ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
+                              : const TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],),
                         ),
                         SlideTransition(
                           position: _player2CardAnimation!,
@@ -426,8 +433,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                               children: pokerGame.players[2].cards.map((card) {
                                 return Padding(
                                   padding: const EdgeInsets.all(2.0),
-                                  child: pokerGame.players[2].showCards
-                                      ? CachedNetworkImage(imageUrl: card.image, width: 50, height: 75)
+                                  child:  pokerGame.players[2].showCards
+                                      ? (pokerGame.players[2].hasFolded || (pokerGame.players[2].stack == 0 && !pokerGame.players[2].isAllIn))
+                                      ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
+                                      : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
+                                      : (pokerGame.players[2].hasFolded || (pokerGame.players[2].stack == 0 && !pokerGame.players[2].isAllIn))
+                                      ? Image.asset('assets/card_back.png', width: 50, height: 75, color: Colors.black38)
                                       : Image.asset('assets/card_back.png', width: 50, height: 75),
                                 );
                               }).toList()
@@ -443,8 +454,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       children: [
                         Text(
                           'COM 3: \$${pokerGame.players[3].stack}',
-                          style: const TextStyle(fontSize: 17, color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                          style: (pokerGame.currentPlayerIndex == 3)
+                              ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
+                              : const TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],),
                         ),
                         SlideTransition(
                           position: _player3CardAnimation!,
@@ -452,8 +466,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                               children: pokerGame.players[3].cards.map((card) {
                                 return Padding(
                                   padding: const EdgeInsets.all(2.0),
-                                  child: pokerGame.players[3].showCards
-                                      ? CachedNetworkImage(imageUrl: card.image, width: 50, height: 75)
+                                  child:  pokerGame.players[3].showCards
+                                      ? (pokerGame.players[3].hasFolded || (pokerGame.players[3].stack == 0 && !pokerGame.players[3].isAllIn))
+                                      ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
+                                      : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
+                                      : (pokerGame.players[3].hasFolded || (pokerGame.players[3].stack == 0 && !pokerGame.players[3].isAllIn))
+                                      ? Image.asset('assets/card_back.png', width: 50, height: 75, color: Colors.black38)
                                       : Image.asset('assets/card_back.png', width: 50, height: 75),
                                 );
                               }).toList()
@@ -469,8 +487,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       children: [
                         Text(
                           'COM 4: \$${pokerGame.players[4].stack}',
-                          style: const TextStyle(fontSize: 17, color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                          style: (pokerGame.currentPlayerIndex == 4)
+                              ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
+                              : const TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],),
                         ),
                         SlideTransition(
                           position: _player4CardAnimation!,
@@ -479,8 +500,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                               children: pokerGame.players[4].cards.map((card) {
                                 return Padding(
                                   padding: const EdgeInsets.all(2.0),
-                                  child: pokerGame.players[4].showCards
-                                      ? CachedNetworkImage(imageUrl: card.image, width: 50, height: 75)
+                                  child:  pokerGame.players[4].showCards
+                                      ? (pokerGame.players[4].hasFolded || (pokerGame.players[4].stack == 0 && !pokerGame.players[4].isAllIn))
+                                      ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
+                                      : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
+                                      : (pokerGame.players[4].hasFolded || (pokerGame.players[4].stack == 0 && !pokerGame.players[4].isAllIn))
+                                      ? Image.asset('assets/card_back.png', width: 50, height: 75, color: Colors.black38)
                                       : Image.asset('assets/card_back.png', width: 50, height: 75),
                                 );
                               }).toList()
@@ -504,8 +529,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       children: [
                         Text(
                           'COM 1: \$${pokerGame.players[1].stack}',
-                          style: const TextStyle(fontSize: 17, color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                          style: (pokerGame.currentPlayerIndex == 1)
+                              ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
+                              : const TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],),
                         ),
                         SlideTransition(
                           position: _player1CardAnimation!,
@@ -513,9 +541,13 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             children: pokerGame.players[1].cards.map((card) {
                               return Padding(
                                 padding: const EdgeInsets.all(2.0),
-                                child: pokerGame.players[1].showCards
-                                ? CachedNetworkImage(imageUrl: card.image, width: 50, height: 75)
-                                : Image.asset('assets/card_back.png', width: 50, height: 75),
+                                child:  pokerGame.players[1].showCards
+                                    ? (pokerGame.players[1].hasFolded || (pokerGame.players[1].stack == 0 && !pokerGame.players[1].isAllIn))
+                                    ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
+                                    : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
+                                    : (pokerGame.players[1].hasFolded || (pokerGame.players[1].stack == 0 && !pokerGame.players[1].isAllIn))
+                                    ? Image.asset('assets/card_back.png', width: 50, height: 75, color: Colors.black38)
+                                    : Image.asset('assets/card_back.png', width: 50, height: 75),
                               );
                             }).toList()
                           ),
@@ -572,8 +604,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       children: [
                         Text(
                           'COM 5: \$${pokerGame.players[5].stack}',
-                          style: const TextStyle(fontSize: 17, color: Colors.white,
-                          fontWeight: FontWeight.bold),
+                          style: (pokerGame.currentPlayerIndex == 5)
+                              ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
+                              : const TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],),
                         ),
                         SlideTransition(
                           position: _player5CardAnimation!,
@@ -582,9 +617,13 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             children: pokerGame.players[5].cards.map((card) {
                               return Padding(
                                 padding: const EdgeInsets.all(2.0),
-                                child: pokerGame.players[5].showCards
-                                  ? CachedNetworkImage(imageUrl: card.image, width: 50, height: 75)
-                                  : Image.asset('assets/card_back.png', width: 50, height: 75),
+                                child:  pokerGame.players[5].showCards
+                                    ? (pokerGame.players[5].hasFolded || (pokerGame.players[5].stack == 0 && !pokerGame.players[5].isAllIn))
+                                    ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
+                                    : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
+                                    : (pokerGame.players[5].hasFolded || (pokerGame.players[5].stack == 0 && !pokerGame.players[5].isAllIn))
+                                    ? Image.asset('assets/card_back.png', width: 50, height: 75, color: Colors.black38)
+                                    : Image.asset('assets/card_back.png', width: 50, height: 75),
                               );
                             }).toList()
                           ),
@@ -600,14 +639,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 children: [
                   Text(
                     'YOU: \$${pokerGame.players[0].stack}',
-                    style: const TextStyle(fontSize: 17, color: Colors.white,
-                        fontWeight: FontWeight.bold, shadows: [
-                        Shadow(
-                          color: Colors.black,
-                          blurRadius: 12,
-                        )
-                      ],
-                    ),
+                    style: (pokerGame.currentPlayerIndex == 0)
+                        ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
+                      shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
+                        : const TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold,
+                      shadows: [Shadow(color: Colors.black, blurRadius: 12,)],),
                   ),
 
                   Row(
@@ -682,7 +718,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                 position: _playerCardAnimations[idx],
                                 child: Padding(
                                   padding: const EdgeInsets.all(2.0),
-                                  child: CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
+                                  child: (pokerGame.players[0].hasFolded || (pokerGame.players[0].stack == 0 && !pokerGame.players[0].isAllIn))
+                                      ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
+                                      : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90),
                                 ),
                               );
                             }).toList(),
