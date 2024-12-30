@@ -5,7 +5,7 @@ import 'package:decktech/models/card_model.dart';
 class PlayerModel {
   final String name;
   final bool isHuman;
-  int currentRoundBet;
+  int hasBet;
   int stack;
   bool hasFolded;
   bool isAllIn;
@@ -17,7 +17,7 @@ class PlayerModel {
   PlayerModel({
     required this.name,
     required this.position,
-    this.currentRoundBet = 0,
+    this.hasBet = 0,
     this.stack = 100,
     this.hasFolded = false,
     this.isAllIn = false,

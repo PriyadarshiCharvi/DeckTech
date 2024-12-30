@@ -13,7 +13,7 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
-  late PokerGame pokerGame;
+  late PokerGame game;
   bool isLoading = true;
 
   late List<AnimationController> _communityCardControllers;
@@ -38,8 +38,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    pokerGame = PokerGame();
-    pokerGame.players = [
+    game = PokerGame();
+    game.players = [
       PlayerModel(name: 'Player', position: 0, isHuman: true),
       PlayerModel(name: 'COM 1', position: 1),
       PlayerModel(name: 'COM 2', position: 2),
@@ -90,7 +90,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       vsync: this,
     );
     _player1CardAnimation = Tween<Offset>(
-      begin: const Offset(-3, 0), // Off-screen to the left
+      begin: const Offset(-3, 0), // Left
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _player1CardController!,
@@ -102,7 +102,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       vsync: this,
     );
     _player2CardAnimation = Tween<Offset>(
-      begin: const Offset(0, -3), // Off-screen above
+      begin: const Offset(0, -3), // Above
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _player2CardController!,
@@ -114,7 +114,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       vsync: this,
     );
     _player3CardAnimation = Tween<Offset>(
-      begin: const Offset(0, -3), // Off-screen above
+      begin: const Offset(0, -3), // Above
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _player3CardController!,
@@ -126,7 +126,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       vsync: this,
     );
     _player4CardAnimation = Tween<Offset>(
-      begin: const Offset(0, -3), // Off-screen above
+      begin: const Offset(0, -3), // Above
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _player4CardController!,
@@ -138,19 +138,40 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       vsync: this,
     );
     _player5CardAnimation = Tween<Offset>(
-      begin: const Offset(3, 0), // Off-screen to the right
+      begin: const Offset(3, 0), // To the right
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _player5CardController!,
       curve: Curves.easeOut,
     ));
 
-    pokerGame.startGame().then((_) {
+    game.startGame().then((_) {
       setState(() {
         isLoading = false;
         _startAnimations();
       });
     });
+    takeBlinds();
+  }
+
+  takeBlinds() {
+    for (PlayerModel player in game.players) {
+      if (player.position == 1) { //SMALL BLIND
+        player.stack -= 1;
+        player.hasBet = 1;
+        player.actedThisRound = true;
+      } else if (player.position == 2) { //BIG BLIND
+        player.stack -= 2;
+        player.hasBet = 2;
+        player.actedThisRound = true;
+        game.roundBet = 2;
+      }
+    }
+    for (int playerIndex = 0; playerIndex < 6; playerIndex++) {
+      if (game.players[playerIndex].position == 3) {
+        game.currentPlayerIndex = playerIndex;
+      }
+    }
   }
 
   bool showPlayerCards = true;
@@ -206,63 +227,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     });
   }
 
-  void onFold() {
-    print('Fold button pressed');
-    if (pokerGame.currentPlayerIndex != 0) {
-      print("It is not your turn");
-    } else {
-      pokerGame.fold();
-    }
-  }
-
-  void onCheck() {
-    print('Check button pressed');
-    if (pokerGame.currentPlayerIndex != 0) {
-      print("It is not your turn");
-    } else {
-      pokerGame.check();
-    }
-  }
-
-  void onCall() {
-    print('Call button pressed');
-    if (pokerGame.currentPlayerIndex != 0) {
-      print("It is not your turn");
-    } else {
-      pokerGame.callLogic();
-    }
-  }
-
-  void onRaise5() {
-    print('Raise5 button pressed');
-    if (pokerGame.currentPlayerIndex != 0) {
-      print("It is not your turn");
-    } else {
-      pokerGame.raise5();
-    }
-  }
-
-  void onRaise20() {
-    print('Raise20 button pressed');
-    if (pokerGame.currentPlayerIndex != 0) {
-      print("It is not your turn");
-    } else {
-      pokerGame.raise20();
-    }
-  }
-
-  void onAllIn() {
-    print('AllIn button pressed');
-    if (pokerGame.currentPlayerIndex != 0) {
-      print("It is not your turn");
-    } else {
-      pokerGame.raiseAllIn();
-    }
-  }
-
-  void revealAllComputerCards() {
+  void revealComCards() {
     setState(() {
-      for (var player in pokerGame.players) {
+      for (var player in game.players) {
         if (!player.isHuman) {player.showCards = true;}
       }
     });
@@ -270,7 +237,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   void hideAllComputerCards() {
     setState(() {
-      for (var player in pokerGame.players) {
+      for (var player in game.players) {
         if (!player.isHuman) {player.showCards = false;}
       }
     });
@@ -278,14 +245,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   int revealState = 0;
 
-  void resetGameAndDealNewCards() {
+  void resetGame() {
     setState(() {
-      for (var controller in _communityCardControllers) {
-        controller.reset();
-      }
-      for (var controller in _playerCardControllers) {
-        controller.reset();
-      }
+      for (var controller in _communityCardControllers) {controller.reset();}
+      for (var controller in _playerCardControllers) {controller.reset();}
       _player1CardController?.reset();
       _player2CardController?.reset();
       _player3CardController?.reset();
@@ -293,13 +256,102 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       _player5CardController?.reset();
       hideAllComputerCards();
 
-      pokerGame.startGame().then((_) {
+      for (int playerIndex = 0; playerIndex < 6; playerIndex++) {
+        PlayerModel player = game.players[playerIndex];
+        player.actedThisRound = false;
+        player.isAllIn = false;
+
+        if (player.stack == 0) {player.hasFolded = true;}
+        else {player.hasFolded = false;}
+      }
+
+      for (int playerIndex = 0; playerIndex < 6; playerIndex++) {
+        PlayerModel player = game.players[playerIndex];
+        if (player.position == 0) {
+          player.position = 6;
+          for (int i = 1; i < 6; i++) {
+            if (!player.hasFolded) {
+              int nextPlayerIndex = playerIndex + i;
+              nextPlayerIndex = nextPlayerIndex % 6;
+              game.players[nextPlayerIndex].position = 0;
+              break;
+            }
+          }
+          break;
+        }
+      }
+
+      int iterator = 0;
+      while (true) {
+        iterator = iterator % 6;
+        if (game.players[iterator].position == 0) {
+          break;
+        }
+        iterator++;
+      }
+
+      game.startGame().then((_) {
         revealState = 0;
         _startAnimations();
       });
+      takeBlinds();
     });
   }
-   
+
+  nextButtonLogic() {
+    List<PlayerModel> inHand = [];
+    //CHECK IF ONLY ONE PLAYER LEFT IN HAND
+    for (PlayerModel player in game.players) {
+      if (!player.hasFolded) {inHand.add(player);}
+    }
+    if (inHand.length == 1) {
+      revealState = 5;
+      inHand[0].stack += game.pot + inHand[0].hasBet;
+      game.pot = 0;
+      resetGame();
+    }
+
+    else {
+      if (game.isBettingComplete() || revealState >= 6) {
+        game.roundEnd();
+        switch (revealState) {
+          case 0: //FLOP
+            for (int i = 0; i < 3; i++) {_communityCardControllers[i].forward();}
+            revealState = 3;
+
+          case 3: //TURN
+          case 4: //RIVER
+            _communityCardControllers[revealState].forward();
+            revealState++;
+
+          case 5: //REVEAL COM CARDS
+            revealComCards();
+            revealState++;
+
+          case 6: //SHOWDOWN
+            //SINGLE PLAYER LEFT
+            if (inHand.length == 1) {inHand[0].stack += game.pot;}
+
+            //MULTIPLE PLAYERS LEFT
+            else {
+              List winners = game.getWinningPlayers(inHand);
+              if (winners.length > 1) {game.splitPot(winners, inHand);}
+              else {inHand[winners[0]].stack += game.pot;}
+            }
+            game.pot = 0;
+            revealState++;
+
+          case 7: resetGame();
+        }
+      }
+      else {
+        game.nextPlayer();
+        if (game.players[game.currentPlayerIndex].hasFolded ||
+            game.players[game.currentPlayerIndex].stack == 0
+        ) {game.nextPlayer();}
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -332,9 +384,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     onPressed: () {Navigator.pop(context);},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white24,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                       fixedSize: const Size(90, 36),
                     ),
                     child: const Text('EXIT', style: TextStyle(fontSize: 14, color: Colors.white)),
@@ -344,51 +394,17 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 Padding(
                   padding: const EdgeInsets.all(6),
                   child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        if (pokerGame.isBettingRoundComplete()) {
-                          pokerGame.roundEnd();
-                          switch(revealState) {
-                            case 0: //FLOP
-                              for (int i = 0; i < 3; i++) {_communityCardControllers[i].forward();}
-                              revealState = 3;
-                              print("-----------------ACTION ON YOU------------------");
-                            case 3: //TURN
-                            case 4: //RIVER
-                              _communityCardControllers[revealState].forward();
-                              revealState++;
-                              print("-----------------ACTION ON YOU------------------");
-                            case 5: //REVEAL COM CARDS
-                              revealAllComputerCards();
-                              revealState++;
-                            case 6: //SHOWDOWN
-                              List<PlayerModel> playersInHand = [];
-                              for (PlayerModel player in pokerGame.players) {
-                                if (!player.hasFolded) {
-                                  playersInHand.add(player);
-                                }
-                              }
-                              List winners = pokerGame.getWinningPlayers(playersInHand);
-                              if (winners.length > 1) { // MULTIPLE WINNERS
-                                pokerGame.splitPot(winners, playersInHand);
-                              } else { //SINGLE WINNER
-                                playersInHand[winners[0]].stack += pokerGame.pot;
-                              }
-                              pokerGame.pot = 0;
-                              revealState++;
-                            case 7: //RESET ROUND
-                              resetGameAndDealNewCards();
-                          }
-                        } else {
-                          pokerGame.nextPlayer();
-                        }
-                      });
-                    },
+                    onPressed: () {setState(() {
+                      if (game.currentPlayerIndex == 0) {
+                        if (!game.players[0].hasFolded && !game.players[0].isAllIn) {
+                          print("Action on you");
+                        } else {nextButtonLogic();}
+                      }
+                      else {nextButtonLogic();}
+                    });},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white24,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                       fixedSize: const Size(90, 36),
                     ),
                     child: const Text('NEXT', style: TextStyle(fontSize: 14, color: Colors.white)),
@@ -416,18 +432,25 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     Column(
                       children: [
                         Text(
-                          'COM 2: \$${pokerGame.players[2].stack}',
-                          style: const TextStyle(fontSize: 17, color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                          '${game.players[2].position}. COM2: \$${game.players[2].stack}-\$${game.players[2].hasBet}',
+                          style: (game.currentPlayerIndex == 2)
+                              ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
+                              : const TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],),
                         ),
                         SlideTransition(
                           position: _player2CardAnimation!,
                           child: Row(mainAxisAlignment: MainAxisAlignment.end,
-                              children: pokerGame.players[2].cards.map((card) {
+                              children: game.players[2].cards.map((card) {
                                 return Padding(
                                   padding: const EdgeInsets.all(2.0),
-                                  child: pokerGame.players[2].showCards
-                                      ? CachedNetworkImage(imageUrl: card.image, width: 50, height: 75)
+                                  child:  game.players[2].showCards
+                                      ? (game.players[2].hasFolded || (game.players[2].stack == 0 && !game.players[2].isAllIn))
+                                      ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
+                                      : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
+                                      : (game.players[2].hasFolded || (game.players[2].stack == 0 && !game.players[2].isAllIn))
+                                      ? Image.asset('assets/card_back.png', width: 50, height: 75, color: Colors.black38)
                                       : Image.asset('assets/card_back.png', width: 50, height: 75),
                                 );
                               }).toList()
@@ -442,18 +465,25 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     Column(
                       children: [
                         Text(
-                          'COM 3: \$${pokerGame.players[3].stack}',
-                          style: const TextStyle(fontSize: 17, color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                          '${game.players[3].position}. COM3: \$${game.players[3].stack}-\$${game.players[3].hasBet}',
+                          style: (game.currentPlayerIndex == 3)
+                              ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
+                              : const TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],),
                         ),
                         SlideTransition(
                           position: _player3CardAnimation!,
                           child: Row(mainAxisAlignment: MainAxisAlignment.end,
-                              children: pokerGame.players[3].cards.map((card) {
+                              children: game.players[3].cards.map((card) {
                                 return Padding(
                                   padding: const EdgeInsets.all(2.0),
-                                  child: pokerGame.players[3].showCards
-                                      ? CachedNetworkImage(imageUrl: card.image, width: 50, height: 75)
+                                  child:  game.players[3].showCards
+                                      ? (game.players[3].hasFolded || (game.players[3].stack == 0 && !game.players[3].isAllIn))
+                                      ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
+                                      : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
+                                      : (game.players[3].hasFolded || (game.players[3].stack == 0 && !game.players[3].isAllIn))
+                                      ? Image.asset('assets/card_back.png', width: 50, height: 75, color: Colors.black38)
                                       : Image.asset('assets/card_back.png', width: 50, height: 75),
                                 );
                               }).toList()
@@ -468,19 +498,26 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     Column(
                       children: [
                         Text(
-                          'COM 4: \$${pokerGame.players[4].stack}',
-                          style: const TextStyle(fontSize: 17, color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                          '${game.players[4].position}. COM4: \$${game.players[4].stack}-\$${game.players[4].hasBet}',
+                          style: (game.currentPlayerIndex == 4)
+                              ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
+                              : const TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],),
                         ),
                         SlideTransition(
                           position: _player4CardAnimation!,
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
-                              children: pokerGame.players[4].cards.map((card) {
+                              children: game.players[4].cards.map((card) {
                                 return Padding(
                                   padding: const EdgeInsets.all(2.0),
-                                  child: pokerGame.players[4].showCards
-                                      ? CachedNetworkImage(imageUrl: card.image, width: 50, height: 75)
+                                  child:  game.players[4].showCards
+                                      ? (game.players[4].hasFolded || (game.players[4].stack == 0 && !game.players[4].isAllIn))
+                                      ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
+                                      : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
+                                      : (game.players[4].hasFolded || (game.players[4].stack == 0 && !game.players[4].isAllIn))
+                                      ? Image.asset('assets/card_back.png', width: 50, height: 75, color: Colors.black38)
                                       : Image.asset('assets/card_back.png', width: 50, height: 75),
                                 );
                               }).toList()
@@ -503,19 +540,26 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     Column(
                       children: [
                         Text(
-                          'COM 1: \$${pokerGame.players[1].stack}',
-                          style: const TextStyle(fontSize: 17, color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                          '${game.players[1].position}. COM1: \$${game.players[1].stack}-\$${game.players[1].hasBet}',
+                          style: (game.currentPlayerIndex == 1)
+                              ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
+                              : const TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],),
                         ),
                         SlideTransition(
                           position: _player1CardAnimation!,
                           child: Row(mainAxisAlignment: MainAxisAlignment.end,
-                            children: pokerGame.players[1].cards.map((card) {
+                            children: game.players[1].cards.map((card) {
                               return Padding(
                                 padding: const EdgeInsets.all(2.0),
-                                child: pokerGame.players[1].showCards
-                                ? CachedNetworkImage(imageUrl: card.image, width: 50, height: 75)
-                                : Image.asset('assets/card_back.png', width: 50, height: 75),
+                                child:  game.players[1].showCards
+                                    ? (game.players[1].hasFolded || (game.players[1].stack == 0 && !game.players[1].isAllIn))
+                                    ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
+                                    : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
+                                    : (game.players[1].hasFolded || (game.players[1].stack == 0 && !game.players[1].isAllIn))
+                                    ? Image.asset('assets/card_back.png', width: 50, height: 75, color: Colors.black38)
+                                    : Image.asset('assets/card_back.png', width: 50, height: 75),
                               );
                             }).toList()
                           ),
@@ -528,19 +572,16 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   Column(
                     children: [
                       Text(
-                          'POT: \$${pokerGame.pot}', style: const TextStyle(fontSize: 17, color: Colors.white,
+                          'POT: \$${game.pot}', style: const TextStyle(fontSize: 17, color: Colors.white,
                           fontWeight: FontWeight.bold, shadows: [
-                            Shadow(
-                              color: Colors.black,
-                              blurRadius: 12,
-                            ),
+                            Shadow(color: Colors.black, blurRadius: 12),
                           ],
                         ),
                       ),
 
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: pokerGame.communityCards
+                        children: game.communityCards
                             .asMap()
                             .entries
                             .map((entry) {
@@ -571,20 +612,27 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     Column(
                       children: [
                         Text(
-                          'COM 5: \$${pokerGame.players[5].stack}',
-                          style: const TextStyle(fontSize: 17, color: Colors.white,
-                          fontWeight: FontWeight.bold),
+                          '${game.players[5].position}. COM5: \$${game.players[5].stack}-\$${game.players[5].hasBet}',
+                          style: (game.currentPlayerIndex == 5)
+                              ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
+                              : const TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 12,)],),
                         ),
                         SlideTransition(
                           position: _player5CardAnimation!,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
-                            children: pokerGame.players[5].cards.map((card) {
+                            children: game.players[5].cards.map((card) {
                               return Padding(
                                 padding: const EdgeInsets.all(2.0),
-                                child: pokerGame.players[5].showCards
-                                  ? CachedNetworkImage(imageUrl: card.image, width: 50, height: 75)
-                                  : Image.asset('assets/card_back.png', width: 50, height: 75),
+                                child:  game.players[5].showCards
+                                    ? (game.players[5].hasFolded || (game.players[5].stack == 0 && !game.players[5].isAllIn))
+                                    ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
+                                    : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
+                                    : (game.players[5].hasFolded || (game.players[5].stack == 0 && !game.players[5].isAllIn))
+                                    ? Image.asset('assets/card_back.png', width: 50, height: 75, color: Colors.black38)
+                                    : Image.asset('assets/card_back.png', width: 50, height: 75),
                               );
                             }).toList()
                           ),
@@ -599,15 +647,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               Column(
                 children: [
                   Text(
-                    'YOU: \$${pokerGame.players[0].stack}',
-                    style: const TextStyle(fontSize: 17, color: Colors.white,
-                        fontWeight: FontWeight.bold, shadows: [
-                        Shadow(
-                          color: Colors.black,
-                          blurRadius: 12,
-                        )
-                      ],
-                    ),
+                    '${game.players[0].position}. YOU: \$${game.players[0].stack}-\$${game.players[0].hasBet}',
+                    style: (game.currentPlayerIndex == 0)
+                        ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
+                      shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
+                        : const TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold,
+                      shadows: [Shadow(color: Colors.black, blurRadius: 12,)],),
                   ),
 
                   Row(
@@ -616,7 +661,14 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       Padding(
                         padding: const EdgeInsets.all(5),
                         child: ElevatedButton(
-                          onPressed:(){setState((){onFold();});},
+                          onPressed:(){setState((){
+                            print('Fold button pressed');
+                            if (game.currentPlayerIndex != 0) {print("Not your turn");}
+                            else {
+                              game.fold();
+                              nextButtonLogic();
+                            }
+                          });},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white24,
                             shape: RoundedRectangleBorder(
@@ -634,7 +686,14 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       Padding(
                         padding: const EdgeInsets.all(0),
                         child: ElevatedButton(
-                          onPressed:(){setState((){onCheck();});},
+                          onPressed:(){setState((){
+                            print('Check button pressed');
+                            if (game.currentPlayerIndex != 0) {print("Not your turn");}
+                            else {
+                              game.check();
+                              nextButtonLogic();
+                            }
+                          });},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white24,
                             shape: RoundedRectangleBorder(
@@ -652,7 +711,14 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       Padding(
                         padding: const EdgeInsets.all(5),
                         child: ElevatedButton(
-                          onPressed:(){setState((){onCall();});},
+                          onPressed:(){setState((){
+                            print('Call button pressed');
+                            if (game.currentPlayerIndex != 0) {print("Not your turn");}
+                            else {
+                              game.callLogic();
+                              nextButtonLogic();
+                            }
+                          });},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white24,
                             shape: RoundedRectangleBorder(
@@ -674,7 +740,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           alignment: Alignment.center,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: pokerGame.players[0].cards
+                            children: game.players[0].cards
                                 .asMap().entries.map((entry) {
                               int idx = entry.key;
                               var card = entry.value;
@@ -682,7 +748,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                 position: _playerCardAnimations[idx],
                                 child: Padding(
                                   padding: const EdgeInsets.all(2.0),
-                                  child: CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
+                                  child: (game.players[0].hasFolded || (game.players[0].stack == 0 && !game.players[0].isAllIn))
+                                      ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
+                                      : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90),
                                 ),
                               );
                             }).toList(),
@@ -693,13 +761,20 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       Padding(
                         padding: const EdgeInsets.all(5),
                         child: ElevatedButton(
-                          onPressed:(){setState((){onRaise5();});},
+                          onPressed:(){setState((){
+                            print('Raise5 button pressed');
+                            if (game.currentPlayerIndex != 0) {print("Not your turn");}
+                            else {
+                              game.raise5();
+                              nextButtonLogic();
+                            }
+                          });},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white24,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            fixedSize: const Size(116, 50),
+                            fixedSize: const Size(114, 50),
                           ),
                           child: const Text(
                               'RAISE 5', style: TextStyle(fontSize: 16,
@@ -711,16 +786,23 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       Padding(
                         padding: const EdgeInsets.all(0),
                         child: ElevatedButton(
-                          onPressed:(){setState((){onRaise20();});},
+                          onPressed:(){setState((){
+                            print('Raise3x button pressed');
+                            if (game.currentPlayerIndex != 0) {print("Not your turn");}
+                            else {
+                              game.raise3x();
+                              nextButtonLogic();
+                            }
+                          });},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white24,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            fixedSize: const Size(116, 50),
+                            fixedSize: const Size(118, 50),
                           ),
                           child: const Text(
-                              'RAISE 20', style: TextStyle(fontSize: 16,
+                              'RAISE 3X', style: TextStyle(fontSize: 16,
                               color: Colors.white, fontWeight: FontWeight.bold)
                           ),
                         ),
@@ -729,7 +811,14 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       Padding(
                         padding: const EdgeInsets.all(5),
                         child: ElevatedButton(
-                          onPressed:(){setState((){onAllIn();});},
+                          onPressed:(){setState((){
+                            print('AllIn button pressed');
+                            if (game.currentPlayerIndex != 0) {print("Not your turn");}
+                            else {
+                              game.raiseAllIn();
+                              nextButtonLogic();
+                            }
+                          });},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white24,
                             shape: RoundedRectangleBorder(
