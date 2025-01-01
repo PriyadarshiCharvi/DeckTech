@@ -265,29 +265,33 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         else {player.hasFolded = false;}
       }
 
-      for (int playerIndex = 0; playerIndex < 6; playerIndex++) {
-        PlayerModel player = game.players[playerIndex];
-        if (player.position == 0) {
-          player.position = 6;
-          for (int i = 1; i < 6; i++) {
-            if (!player.hasFolded) {
-              int nextPlayerIndex = playerIndex + i;
-              nextPlayerIndex = nextPlayerIndex % 6;
-              game.players[nextPlayerIndex].position = 0;
-              break;
-            }
+      //RESET POSITIONS
+      int playerIndex = 0;
+      while (playerIndex < 6) {
+        if (game.players[playerIndex].position == 0) {
+          if (game.players[playerIndex].hasFolded) {
+            game.players[playerIndex].position = 100;
+          } else {
+            game.players[playerIndex].position = 5;
           }
           break;
         }
+        else {playerIndex++;}
       }
-
-      int iterator = 0;
+      playerIndex++;
+      int position = 0;
       while (true) {
-        iterator = iterator % 6;
-        if (game.players[iterator].position == 0) {
-          break;
+        playerIndex = playerIndex % 6;
+        if (game.players[playerIndex].position == 0) {break;}
+        else if (!game.players[playerIndex].hasFolded) {
+          game.players[playerIndex].position = position;
+          playerIndex++;
+          position++;
         }
-        iterator++;
+        else {
+          game.players[playerIndex].position = 100;
+          playerIndex++;
+        }
       }
 
       game.startGame().then((_) {
@@ -318,21 +322,15 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
           case 0: //FLOP
             for (int i = 0; i < 3; i++) {_communityCardControllers[i].forward();}
             revealState = 3;
-
           case 3: //TURN
           case 4: //RIVER
             _communityCardControllers[revealState].forward();
             revealState++;
-
           case 5: //REVEAL COM CARDS
             revealComCards();
             revealState++;
-
           case 6: //SHOWDOWN
-            //SINGLE PLAYER LEFT
             if (inHand.length == 1) {inHand[0].stack += game.pot;}
-
-            //MULTIPLE PLAYERS LEFT
             else {
               List winners = game.getWinningPlayers(inHand);
               if (winners.length > 1) {game.splitPot(winners, inHand);}
@@ -340,15 +338,29 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             }
             game.pot = 0;
             revealState++;
-
-          case 7: resetGame();
+          case 7: resetGame(); //RESET
         }
       }
       else {
-        game.nextPlayer();
         if (game.players[game.currentPlayerIndex].hasFolded ||
+            game.players[game.currentPlayerIndex].isAllIn ||
             game.players[game.currentPlayerIndex].stack == 0
-        ) {game.nextPlayer();}
+        ) {
+          game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+          nextButtonLogic();
+        } else {
+          game.computerActions();
+          game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+          while (true) {
+            if (game.players[game.currentPlayerIndex].hasFolded ||
+                game.players[game.currentPlayerIndex].isAllIn ||
+                game.players[game.currentPlayerIndex].stack == 0
+            ) {
+              game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+            }
+            else {break;}
+          }
+        }
       }
     }
   }
@@ -396,11 +408,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   child: ElevatedButton(
                     onPressed: () {setState(() {
                       if (game.currentPlayerIndex == 0) {
-                        if (!game.players[0].hasFolded && !game.players[0].isAllIn) {
+                        if (!game.players[0].hasFolded &&
+                            !game.players[0].isAllIn) {
                           print("Action on you");
-                        } else {nextButtonLogic();}
+                        }
                       }
-                      else {nextButtonLogic();}
+                      nextButtonLogic();
                     });},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white24,
@@ -432,7 +445,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     Column(
                       children: [
                         Text(
-                          '${game.players[2].position}. COM2: \$${game.players[2].stack}-\$${game.players[2].hasBet}',
+                          (game.players[2].position == 100)
+                              ? 'COM2: OUT'
+                              : '${game.players[2].position}. COM2: \$${game.players[2].stack}-\$${game.players[2].hasBet}'
+                          ,
+                          // style: (!game.players[2].hasFolded && (game.currentPlayerIndex == 2 || (game.currentPlayerIndex == 1 && game.players[1].hasFolded)))
                           style: (game.currentPlayerIndex == 2)
                               ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
                             shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
@@ -465,7 +482,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     Column(
                       children: [
                         Text(
-                          '${game.players[3].position}. COM3: \$${game.players[3].stack}-\$${game.players[3].hasBet}',
+                          (game.players[3].position == 100)
+                              ? 'COM3: OUT'
+                              : '${game.players[3].position}. COM3: \$${game.players[3].stack}-\$${game.players[3].hasBet}'
+                          ,
+                          // style: (!game.players[3].hasFolded && (game.currentPlayerIndex == 3 || (game.currentPlayerIndex == 2 && game.players[2].hasFolded)))
                           style: (game.currentPlayerIndex == 3)
                               ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
                             shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
@@ -498,7 +519,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     Column(
                       children: [
                         Text(
-                          '${game.players[4].position}. COM4: \$${game.players[4].stack}-\$${game.players[4].hasBet}',
+                          (game.players[4].position == 100)
+                              ? 'COM4: OUT'
+                              : '${game.players[4].position}. COM4: \$${game.players[4].stack}-\$${game.players[4].hasBet}'
+                          ,
+                          // style: (!game.players[4].hasFolded && (game.currentPlayerIndex == 4 || (game.currentPlayerIndex == 3 && game.players[3].hasFolded)))
                           style: (game.currentPlayerIndex == 4)
                               ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
                             shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
@@ -540,7 +565,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     Column(
                       children: [
                         Text(
-                          '${game.players[1].position}. COM1: \$${game.players[1].stack}-\$${game.players[1].hasBet}',
+                          (game.players[1].position == 100)
+                              ? 'COM1: OUT'
+                              : '${game.players[1].position}. COM1: \$${game.players[1].stack}-\$${game.players[1].hasBet}'
+                          ,
+                          // style: (!game.players[1].hasFolded && (game.currentPlayerIndex == 1 || (game.currentPlayerIndex == 0 && game.players[0].hasFolded)))
                           style: (game.currentPlayerIndex == 1)
                               ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
                             shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
@@ -585,17 +614,17 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             .asMap()
                             .entries
                             .map((entry) {
-                          int idx = entry.key;
+                          int index = entry.key;
                           var card = entry.value;
 
                           Widget cardWidget;
-                          if (idx < revealState) {
+                          if (index < revealState) {
                             cardWidget = CachedNetworkImage(imageUrl: card.image, width: 50, height: 75);
                           } else {
                             cardWidget = const Image(image: AssetImage('assets/card_back.png'), width: 50, height: 75);
                           }
                           return SlideTransition(
-                            position: _communityCardAnimations[idx],
+                            position: _communityCardAnimations[index],
                             child: Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: cardWidget,
@@ -612,7 +641,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     Column(
                       children: [
                         Text(
-                          '${game.players[5].position}. COM5: \$${game.players[5].stack}-\$${game.players[5].hasBet}',
+                          (game.players[5].position == 100)
+                              ? 'COM5: OUT'
+                              : '${game.players[5].position}. COM5: \$${game.players[5].stack}-\$${game.players[5].hasBet}'
+                          ,
+                          // style: (!game.players[5].hasFolded && (game.currentPlayerIndex == 5 || (game.currentPlayerIndex == 4 && game.players[4].hasFolded)))
                           style: (game.currentPlayerIndex == 5)
                               ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
                             shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
@@ -647,7 +680,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               Column(
                 children: [
                   Text(
-                    '${game.players[0].position}. YOU: \$${game.players[0].stack}-\$${game.players[0].hasBet}',
+                    (game.players[0].position == 100)
+                        ? 'YOU: OUT'
+                        : '${game.players[0].position}. YOU: \$${game.players[0].stack}-\$${game.players[0].hasBet}'
+                    ,
+                    // style: (!game.players[0].hasFolded && (game.currentPlayerIndex == 0 || (game.currentPlayerIndex == 5 && game.players[5].hasFolded)))
                     style: (game.currentPlayerIndex == 0)
                         ? const TextStyle(fontSize: 17, color: Colors.yellow, fontWeight: FontWeight.bold,
                       shadows: [Shadow(color: Colors.black, blurRadius: 12,)],)
@@ -666,7 +703,16 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             if (game.currentPlayerIndex != 0) {print("Not your turn");}
                             else {
                               game.fold();
-                              nextButtonLogic();
+                              game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                              while (true) {
+                                if (game.players[game.currentPlayerIndex].hasFolded ||
+                                    game.players[game.currentPlayerIndex].isAllIn ||
+                                    game.players[game.currentPlayerIndex].stack == 0
+                                ) {
+                                  game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                                }
+                                else {break;}
+                              }
                             }
                           });},
                           style: ElevatedButton.styleFrom(
@@ -691,7 +737,16 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             if (game.currentPlayerIndex != 0) {print("Not your turn");}
                             else {
                               game.check();
-                              nextButtonLogic();
+                              game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                              while (true) {
+                                if (game.players[game.currentPlayerIndex].hasFolded ||
+                                    game.players[game.currentPlayerIndex].isAllIn ||
+                                    game.players[game.currentPlayerIndex].stack == 0
+                                ) {
+                                  game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                                }
+                                else {break;}
+                              }
                             }
                           });},
                           style: ElevatedButton.styleFrom(
@@ -716,7 +771,16 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             if (game.currentPlayerIndex != 0) {print("Not your turn");}
                             else {
                               game.callLogic();
-                              nextButtonLogic();
+                              game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                              while (true) {
+                                if (game.players[game.currentPlayerIndex].hasFolded ||
+                                    game.players[game.currentPlayerIndex].isAllIn ||
+                                    game.players[game.currentPlayerIndex].stack == 0
+                                ) {
+                                  game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                                }
+                                else {break;}
+                              }
                             }
                           });},
                           style: ElevatedButton.styleFrom(
@@ -766,7 +830,16 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             if (game.currentPlayerIndex != 0) {print("Not your turn");}
                             else {
                               game.raise5();
-                              nextButtonLogic();
+                              game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                              while (true) {
+                                if (game.players[game.currentPlayerIndex].hasFolded ||
+                                    game.players[game.currentPlayerIndex].isAllIn ||
+                                    game.players[game.currentPlayerIndex].stack == 0
+                                ) {
+                                  game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                                }
+                                else {break;}
+                              }
                             }
                           });},
                           style: ElevatedButton.styleFrom(
@@ -791,7 +864,16 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             if (game.currentPlayerIndex != 0) {print("Not your turn");}
                             else {
                               game.raise3x();
-                              nextButtonLogic();
+                              game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                              while (true) {
+                                if (game.players[game.currentPlayerIndex].hasFolded ||
+                                    game.players[game.currentPlayerIndex].isAllIn ||
+                                    game.players[game.currentPlayerIndex].stack == 0
+                                ) {
+                                  game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                                }
+                                else {break;}
+                              }
                             }
                           });},
                           style: ElevatedButton.styleFrom(
@@ -816,7 +898,16 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             if (game.currentPlayerIndex != 0) {print("Not your turn");}
                             else {
                               game.raiseAllIn();
-                              nextButtonLogic();
+                              game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                              while (true) {
+                                if (game.players[game.currentPlayerIndex].hasFolded ||
+                                    game.players[game.currentPlayerIndex].isAllIn ||
+                                    game.players[game.currentPlayerIndex].stack == 0
+                                ) {
+                                  game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                                }
+                                else {break;}
+                              }
                             }
                           });},
                           style: ElevatedButton.styleFrom(

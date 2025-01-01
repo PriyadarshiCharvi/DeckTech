@@ -39,19 +39,6 @@ class PokerGame {
     communityCards = draw.cards;
   }
 
-  //Next player action handler
-  void nextPlayer() {
-    PlayerModel player = players[currentPlayerIndex];
-    if (player.hasFolded) {
-      print("${player.name} has folded");
-    } else if (player.isAllIn) {
-      print("${player.name} is all in");
-    } else if (player.stack == 0) {
-      print("${player.name} has no money left");
-    } else if (currentPlayerIndex != 0) {computerActions();}
-    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-  }
-
   // Check if betting round is complete
   bool isBettingComplete() {
     for (PlayerModel player in players) {
@@ -70,15 +57,24 @@ class PokerGame {
       PlayerModel player = players[playerIndex];
       pot += player.hasBet;
       player.hasBet = 0;
-
       if (!player.isAllIn && !player.hasFolded) {player.actedThisRound = false;}
     }
     roundBet = 0;
     print("-------------BETTING ROUND COMPLETE-------------");
     for (int playerIndex = 0; playerIndex < 6; playerIndex++) {
-      if (players[playerIndex].position == 1) {currentPlayerIndex = playerIndex;}
+      if (players[playerIndex].position == 1) {
+        currentPlayerIndex = playerIndex;
+        while (true) {
+          if (players[currentPlayerIndex].hasFolded ||
+              players[currentPlayerIndex].isAllIn ||
+              players[currentPlayerIndex].stack == 0
+          ) {
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+          }
+          else {break;}
+        }
+      }
     }
-    return;
   }
 
   // Player action: Raise by 5
