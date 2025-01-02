@@ -51,28 +51,32 @@ class PokerGame {
     return true;
   }
 
-  // Round end
-  Future<void> roundEnd() async{
-    for (int playerIndex = 0; playerIndex < 6; playerIndex++) {
-      PlayerModel player = players[playerIndex];
-      pot += player.hasBet;
-      player.hasBet = 0;
-      if (!player.isAllIn && !player.hasFolded) {player.actedThisRound = false;}
-    }
-    roundBet = 0;
-    print("-------------BETTING ROUND COMPLETE-------------");
-    for (int playerIndex = 0; playerIndex < 6; playerIndex++) {
-      if (players[playerIndex].position == 1) {
-        currentPlayerIndex = playerIndex;
-        while (true) {
-          if (players[currentPlayerIndex].hasFolded ||
-              players[currentPlayerIndex].isAllIn ||
-              players[currentPlayerIndex].stack == 0
-          ) {
-            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-          }
-          else {break;}
+  shiftPositions () {
+    int playerIndex = 0;
+    while (playerIndex < 6) {
+      if (players[playerIndex].position == 0) {
+        if (players[playerIndex].hasFolded) {
+          players[playerIndex].position = 100;
+        } else {
+          players[playerIndex].position = 5;
         }
+        break;
+      }
+      else {playerIndex++;}
+    }
+    playerIndex++;
+    int position = 0;
+    while (true) {
+      playerIndex = playerIndex % 6;
+      if (players[playerIndex].position == 0) {break;}
+      else if (!players[playerIndex].hasFolded) {
+        players[playerIndex].position = position;
+        playerIndex++;
+        position++;
+      }
+      else {
+        players[playerIndex].position = 100;
+        playerIndex++;
       }
     }
   }
@@ -212,11 +216,65 @@ class PokerGame {
   //Computer action
   Future<void> computerActions() async{
     print("------${players[currentPlayerIndex].name} ACTION------");
-    var rand = random(0, 100);
-    if (rand <= 50) {callLogic();}
-    else if (rand <= 70) {raise5();}
-    else if (rand <= 85) {raise3x();}
-    else {fold();}
+
+    PlayerModel player = players[currentPlayerIndex];
+    List<CardModel> hand = player.cards;
+
+    Card playerCard1 = Card.parse(hand[0].getCode());
+    Card playerCard2 = Card.parse(hand[1].getCode());
+
+    String communityCardsString = communityCards.map((card) => card.getCode()).join();
+
+    int communityCardCount = communityCards.length;
+    String gameState = '';
+
+    if (communityCardCount == 0) {
+      gameState = 'pre-flop';
+    } else if (communityCardCount == 3) {
+      gameState = 'flop';
+    } else if (communityCardCount == 4) {
+      gameState = 'turn';
+    } else if (communityCardCount == 5) {
+      gameState = 'river';
+    }
+
+    MadeHand playerHandStrength;
+
+    if (gameState == 'pre-flop') {
+      if (playerCard1.rank == playerCard2.rank && playerCard1.rank.index > 5) {
+        raise5();
+      } else if (playerCard1.rank.index >= 10 || playerCard2.rank.index >= 10) {
+        callLogic();
+      } else {
+        fold();
+      }
+    } else {
+      playerHandStrength = MadeHand.best(ImmutableCardSet.parse("$playerCard1$playerCard2$communityCardsString"));
+
+      if (gameState == 'flop' || gameState == 'turn') {
+        if (playerHandStrength.type.index >= MadeHandType.twoPairs.index) {
+          raise3x();
+        } else if (playerHandStrength.type == MadeHandType.pair) {
+          if (roundBet == 0) {check();}
+          else {callLogic();}
+        } else {
+          if (roundBet == 0) {check();}
+          else {fold();}
+        }
+      } else if (gameState == 'river') {
+        if (playerHandStrength.type.index >= MadeHandType.straight.index) {
+          raiseAllIn();
+        } else if (playerHandStrength.type == MadeHandType.trips) {
+          raise3x();
+        } else if (playerHandStrength.type == MadeHandType.twoPairs) {
+          if (roundBet == 0) {check();}
+          else {callLogic();}
+        } else {
+          if (roundBet == 0) {check();}
+          else {fold();}
+        }
+      }
+    }
   }
 
   //Return index of winning player/s at showdown

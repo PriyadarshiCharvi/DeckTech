@@ -246,7 +246,6 @@ class _GameScreenState extends State<SpectateScreen> with TickerProviderStateMix
             icon: const Icon(Icons.play_arrow),
             onPressed: () {
               setState(() {
-                pokerGame.roundEnd();
                 if (revealState == 0) {
                   // Reveal the first 3 cards simultaneously
                   for (int i = 0; i < 3; i++) {

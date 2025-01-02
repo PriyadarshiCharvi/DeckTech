@@ -222,11 +222,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void refreshStacksAndPots() {
-    setState(() {
-    });
-  }
-
   void revealComCards() {
     setState(() {
       for (var player in game.players) {
@@ -265,34 +260,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         else {player.hasFolded = false;}
       }
 
-      //RESET POSITIONS
-      int playerIndex = 0;
-      while (playerIndex < 6) {
-        if (game.players[playerIndex].position == 0) {
-          if (game.players[playerIndex].hasFolded) {
-            game.players[playerIndex].position = 100;
-          } else {
-            game.players[playerIndex].position = 5;
-          }
-          break;
-        }
-        else {playerIndex++;}
-      }
-      playerIndex++;
-      int position = 0;
-      while (true) {
-        playerIndex = playerIndex % 6;
-        if (game.players[playerIndex].position == 0) {break;}
-        else if (!game.players[playerIndex].hasFolded) {
-          game.players[playerIndex].position = position;
-          playerIndex++;
-          position++;
-        }
-        else {
-          game.players[playerIndex].position = 100;
-          playerIndex++;
-        }
-      }
+      game.shiftPositions();
 
       game.startGame().then((_) {
         revealState = 0;
@@ -300,6 +268,39 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       });
       takeBlinds();
     });
+  }
+
+
+  // Round end
+  Future<void> roundEnd() async{
+    for (int playerIndex = 0; playerIndex < 6; playerIndex++) {
+      PlayerModel player = game.players[playerIndex];
+      game.pot += player.hasBet;
+      player.hasBet = 0;
+      if (!player.isAllIn && !player.hasFolded) {player.actedThisRound = false;}
+    }
+    game.roundBet = 0;
+    print("-------------BETTING ROUND COMPLETE-------------");
+    if (game.isBettingComplete()) {nextButtonLogic;}
+    else {
+      for (int playerIndex = 0; playerIndex < 6; playerIndex++) {
+        if (game.players[playerIndex].position == 1) {
+          game.currentPlayerIndex = playerIndex;
+          while (true) {
+            if (game.players[game.currentPlayerIndex].hasFolded ||
+                game.players[game.currentPlayerIndex].isAllIn ||
+                game.players[game.currentPlayerIndex].stack == 0
+            ) {
+              game.currentPlayerIndex =
+                  (game.currentPlayerIndex + 1) % game.players.length;
+            }
+            else {
+              break;
+            }
+          }
+        }
+      }
+    }
   }
 
   nextButtonLogic() {
@@ -310,56 +311,58 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     }
     if (inHand.length == 1) {
       revealState = 5;
-      inHand[0].stack += game.pot + inHand[0].hasBet;
+      for (PlayerModel player in game.players) {
+        game.pot += player.hasBet;
+        player.hasBet = 0;
+      }
+      inHand[0].stack += game.pot;
       game.pot = 0;
       resetGame();
     }
 
-    else {
-      if (game.isBettingComplete() || revealState >= 6) {
-        game.roundEnd();
-        switch (revealState) {
-          case 0: //FLOP
-            for (int i = 0; i < 3; i++) {_communityCardControllers[i].forward();}
-            revealState = 3;
-          case 3: //TURN
-          case 4: //RIVER
-            _communityCardControllers[revealState].forward();
-            revealState++;
-          case 5: //REVEAL COM CARDS
-            revealComCards();
-            revealState++;
-          case 6: //SHOWDOWN
-            if (inHand.length == 1) {inHand[0].stack += game.pot;}
-            else {
-              List winners = game.getWinningPlayers(inHand);
-              if (winners.length > 1) {game.splitPot(winners, inHand);}
-              else {inHand[winners[0]].stack += game.pot;}
-            }
-            game.pot = 0;
-            revealState++;
-          case 7: resetGame(); //RESET
-        }
-      }
-      else {
-        if (game.players[game.currentPlayerIndex].hasFolded ||
-            game.players[game.currentPlayerIndex].isAllIn ||
-            game.players[game.currentPlayerIndex].stack == 0
-        ) {
-          game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
-          nextButtonLogic();
-        } else {
-          game.computerActions();
-          game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
-          while (true) {
-            if (game.players[game.currentPlayerIndex].hasFolded ||
-                game.players[game.currentPlayerIndex].isAllIn ||
-                game.players[game.currentPlayerIndex].stack == 0
-            ) {
-              game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
-            }
-            else {break;}
+    if (game.isBettingComplete() || revealState >= 6) {
+      roundEnd();
+      switch (revealState) {
+        case 0: //FLOP
+          for (int i = 0; i < 3; i++) {_communityCardControllers[i].forward();}
+          revealState = 3;
+        case 3: //TURN
+        case 4: //RIVER
+          _communityCardControllers[revealState].forward();
+          revealState++;
+        case 5: //REVEAL COM CARDS
+          revealComCards();
+          revealState++;
+        case 6: //SHOWDOWN
+          if (inHand.length == 1) {inHand[0].stack += game.pot;}
+          else {
+            List winners = game.getWinningPlayers(inHand);
+            if (winners.length > 1) {game.splitPot(winners, inHand);}
+            else {inHand[winners[0]].stack += game.pot;}
           }
+          game.pot = 0;
+          revealState++;
+        case 7: resetGame(); //RESET
+      }
+    } else {
+      if (game.players[game.currentPlayerIndex].hasFolded ||
+          game.players[game.currentPlayerIndex].isAllIn ||
+          game.players[game.currentPlayerIndex].stack == 0
+      ) {
+        game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+        nextButtonLogic();
+      } else {
+        game.computerActions();
+        game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+        while (true) {
+          if ((!game.isBettingComplete()) && (
+              game.players[game.currentPlayerIndex].hasFolded ||
+                  game.players[game.currentPlayerIndex].isAllIn ||
+                  game.players[game.currentPlayerIndex].stack == 0)
+          ) {
+            game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+          }
+          else {break;}
         }
       }
     }
@@ -407,13 +410,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   padding: const EdgeInsets.all(6),
                   child: ElevatedButton(
                     onPressed: () {setState(() {
-                      if (game.currentPlayerIndex == 0) {
-                        if (!game.players[0].hasFolded &&
-                            !game.players[0].isAllIn) {
-                          print("Action on you");
+                        if (game.currentPlayerIndex == 0) {
+                          if (!game.players[0].hasFolded && !game.players[0].isAllIn) {
+                            print("Action on you");
+                          }
                         }
-                      }
-                      nextButtonLogic();
+                        nextButtonLogic();
                     });},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white24,
@@ -704,6 +706,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             else {
                               game.fold();
                               game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                              if (game.isBettingComplete()) {nextButtonLogic;}
                               while (true) {
                                 if (game.players[game.currentPlayerIndex].hasFolded ||
                                     game.players[game.currentPlayerIndex].isAllIn ||
@@ -738,6 +741,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             else {
                               game.check();
                               game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                              if (game.isBettingComplete()) {nextButtonLogic;}
                               while (true) {
                                 if (game.players[game.currentPlayerIndex].hasFolded ||
                                     game.players[game.currentPlayerIndex].isAllIn ||
@@ -772,6 +776,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             else {
                               game.callLogic();
                               game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                              if (game.isBettingComplete()) {nextButtonLogic;}
                               while (true) {
                                 if (game.players[game.currentPlayerIndex].hasFolded ||
                                     game.players[game.currentPlayerIndex].isAllIn ||
@@ -831,6 +836,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             else {
                               game.raise5();
                               game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                              if (game.isBettingComplete()) {nextButtonLogic;}
                               while (true) {
                                 if (game.players[game.currentPlayerIndex].hasFolded ||
                                     game.players[game.currentPlayerIndex].isAllIn ||
@@ -865,6 +871,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             else {
                               game.raise3x();
                               game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                              if (game.isBettingComplete()) {nextButtonLogic;}
                               while (true) {
                                 if (game.players[game.currentPlayerIndex].hasFolded ||
                                     game.players[game.currentPlayerIndex].isAllIn ||
@@ -899,6 +906,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             else {
                               game.raiseAllIn();
                               game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+                              if (game.isBettingComplete()) {nextButtonLogic;}
                               while (true) {
                                 if (game.players[game.currentPlayerIndex].hasFolded ||
                                     game.players[game.currentPlayerIndex].isAllIn ||
