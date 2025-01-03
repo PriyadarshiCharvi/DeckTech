@@ -42,33 +42,56 @@ class PokerGame {
   // Check if betting round is complete
   bool isBettingComplete() {
     for (PlayerModel player in players) {
-      if (!player.hasFolded && !player.isAllIn && player.stack != 0) {
-        if (player.actedThisRound) {
-          if (player.hasBet != roundBet) {return false;}
-        } else {return false;}
+      if (player.hasFolded) {
+        continue;
+      } else if (player.isAllIn) {
+        continue;
+      } else if (player.stack == 0) {
+        continue;
+      } else if(!player.actedThisRound) {
+        return false;
+      } else if (player.actedThisRound && player.hasBet == roundBet) {
+        continue;
+      } else {
+        return false;
       }
     }
     return true;
   }
 
-  shiftPositions () {
+  bool currentPlayerCannotAct() {
+    return (players[currentPlayerIndex].hasFolded ||
+        players[currentPlayerIndex].isAllIn ||
+        players[currentPlayerIndex].stack == 0);
+  }
+
+  void shiftPlayerIndex() {
+    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+  }
+
+  void shiftPositions () {
     int playerIndex = 0;
     while (playerIndex < 6) {
       if (players[playerIndex].position == 0) {
         if (players[playerIndex].hasFolded) {
           players[playerIndex].position = 100;
-        } else {
+        }
+        else {
           players[playerIndex].position = 5;
         }
         break;
       }
-      else {playerIndex++;}
+      else {
+        playerIndex++;
+      }
     }
     playerIndex++;
     int position = 0;
     while (true) {
       playerIndex = playerIndex % 6;
-      if (players[playerIndex].position == 0) {break;}
+      if (players[playerIndex].position == 0) {
+        break;
+      }
       else if (!players[playerIndex].hasFolded) {
         players[playerIndex].position = position;
         playerIndex++;
@@ -81,57 +104,59 @@ class PokerGame {
     }
   }
 
-  // Player action: Raise by 5
-  Future<void> raise5() async{
+  // Player action: Raise small
+  Future<void> raiseSmall() async{
     PlayerModel player = players[currentPlayerIndex];
-    if (roundBet > 5) {
-      print("Raising by 5 is not a valid raise");
-      callLogic();
+
+    int bet;
+    if (roundBet == 0) {
+      bet = (pot*0.33).floor();
     } else {
-      int bet = 5 + roundBet;
-
-      if (player.actedThisRound) { //RETRACTING PREVIOUS BET
-        player.stack += player.hasBet;
-        player.hasBet = 0;
-      }
-
-      if ((bet >= player.stack)) { //STACK TOO SMALL
-        print("${player.name}'s stack not big enough to raise by 5");
-        raiseAllIn();
-      } else {
-        player.stack -= bet;
-        player.hasBet = bet;
-        roundBet = bet;
-        //PRINTS AND INDICATIONS
-        print("${player.name} raises by 5");
-        print("${player.name} current round bet: ${player.hasBet}");
-        print("${player.name} stack: ${player.stack}");
-        print("Pot: $pot");
-        player.actedThisRound = true;
-      }
+      bet = (roundBet*2.5).floor();
     }
-  }
 
-  // Player action: Raise by 20
-  Future<void> raise3x() async{
-    PlayerModel player = players[currentPlayerIndex];
-    int bet = 3 * roundBet;
-    if (player.actedThisRound) { //RETRACTING PREVIOUS BET
-      player.stack += player.hasBet;
-    }
+    player.retractPreviousBet();
     if ((bet >= player.stack)) { //STACK TOO SMALL
-      print("${player.name}'s stack not big enough to raise 3x");
+      print("${player.name}'s stack not enough to bet small");
       raiseAllIn();
     } else {
-      player.stack -= bet;
-      player.hasBet = bet;
+      player.bet(bet);
       roundBet = bet;
+      player.actedThisRound = true;
+
       //PRINTS AND INDICATIONS
-      print("${player.name} raises 3x");
+      print("${player.name} raises small");
       print("${player.name} current round bet: ${player.hasBet}");
       print("${player.name} stack: ${player.stack}");
       print("Pot: $pot");
+    }
+  }
+
+  // Player action: Raise big
+  Future<void> raiseBig() async{
+    PlayerModel player = players[currentPlayerIndex];
+
+    int bet;
+    if (roundBet == 0) {
+      bet = (pot*0.66).floor();
+    } else {
+      bet = (roundBet*4.5).floor();
+    }
+
+    player.retractPreviousBet();
+    if ((bet >= player.stack)) { //STACK TOO SMALL
+      print("${player.name}'s stack not enough to raise big");
+      raiseAllIn();
+    } else {
+      player.bet(bet);
+      roundBet = bet;
       player.actedThisRound = true;
+
+      //PRINTS AND INDICATIONS
+      print("${player.name} raises big");
+      print("${player.name} current round bet: ${player.hasBet}");
+      print("${player.name} stack: ${player.stack}");
+      print("Pot: $pot");
     }
   }
 
@@ -139,11 +164,12 @@ class PokerGame {
   Future<void> raiseAllIn() async{
     PlayerModel player = players[currentPlayerIndex];
     int bet = player.stack;
-    player.stack = 0;
+    player.bet(bet);
     player.isAllIn = true;
-    player.hasBet = bet;
 
-    if (bet > roundBet) {roundBet = bet;} // IF RAISE ALL IN
+    if (bet > roundBet) {
+      roundBet = bet;
+    } // IF RAISE (NOT CALL)
 
     //PRINTS AND INDICATIONS
     print("${player.name} is all in");
@@ -156,8 +182,7 @@ class PokerGame {
   Future<void> call() async{
     int bet = roundBet;
     PlayerModel player = players[currentPlayerIndex];
-    player.stack -= bet;
-    player.hasBet = bet;
+    player.bet(bet);
     //PRINTS AND INDICATIONS
     print("${player.name} calls");
     print("${player.name} current round bet: ${player.hasBet}");
@@ -170,13 +195,17 @@ class PokerGame {
   Future<void> callLogic() async{
     int bet = roundBet;
     PlayerModel player = players[currentPlayerIndex];
-    if (bet == 0) {check();}
+    if (bet == 0) {
+      check();
+    }
     else {
-      if (player.actedThisRound) { //RETRACTING PREVIOUS BET
-        player.stack += player.hasBet;
+      player.retractPreviousBet();
+      if ((bet >= player.stack)) {
+        raiseAllIn();
+      } //STACK TOO SMALL
+      else {
+        call();
       }
-      if ((bet >= player.stack)) {raiseAllIn();} //STACK TOO SMALL
-      else {call();}
     }
   }
 
@@ -192,7 +221,9 @@ class PokerGame {
       player.actedThisRound = true;
     } else {
       print("Cannot Check");
-      if (currentPlayerIndex != 0) {computerActions();}
+      if (currentPlayerIndex != 0) {
+        computerActions();
+      }
     }
   }
 
@@ -242,7 +273,7 @@ class PokerGame {
 
     if (gameState == 'pre-flop') {
       if (playerCard1.rank == playerCard2.rank && playerCard1.rank.index > 5) {
-        raise5();
+        raiseSmall();
       } else if (playerCard1.rank.index >= 10 || playerCard2.rank.index >= 10) {
         callLogic();
       } else {
@@ -253,25 +284,37 @@ class PokerGame {
 
       if (gameState == 'flop' || gameState == 'turn') {
         if (playerHandStrength.type.index >= MadeHandType.twoPairs.index) {
-          raise3x();
+          raiseBig();
         } else if (playerHandStrength.type == MadeHandType.pair) {
-          if (roundBet == 0) {check();}
-          else {callLogic();}
+          if (roundBet == 0) {
+            check();
+          } else {
+            callLogic();
+          }
         } else {
-          if (roundBet == 0) {check();}
-          else {fold();}
+          if (roundBet == 0) {
+            check();
+          } else {
+            fold();
+          }
         }
       } else if (gameState == 'river') {
         if (playerHandStrength.type.index >= MadeHandType.straight.index) {
           raiseAllIn();
         } else if (playerHandStrength.type == MadeHandType.trips) {
-          raise3x();
+          raiseBig();
         } else if (playerHandStrength.type == MadeHandType.twoPairs) {
-          if (roundBet == 0) {check();}
-          else {callLogic();}
+          if (roundBet == 0) {
+            check();
+          } else {
+            callLogic();
+          }
         } else {
-          if (roundBet == 0) {check();}
-          else {fold();}
+          if (roundBet == 0) {
+            check();
+          } else {
+            fold();
+          }
         }
       }
     }
@@ -291,7 +334,7 @@ class PokerGame {
   }
 
   //Splits pot between multiple winners
-  splitPot(List listOfWinners, playersInHand) {
+  void splitPot(List listOfWinners, playersInHand) {
     int numberOfWinners = listOfWinners.length;
     int individualWinnings = (pot/numberOfWinners).floor();
     for (int playerIndex in listOfWinners) {
