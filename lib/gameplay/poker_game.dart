@@ -42,10 +42,18 @@ class PokerGame {
   // Check if betting round is complete
   bool isBettingComplete() {
     for (PlayerModel player in players) {
-      if (!player.hasFolded && !player.isAllIn && player.stack != 0) {
-        if (player.actedThisRound) {
-          if (player.hasBet != roundBet) {return false;}
-        } else {return false;}
+      if (player.hasFolded) {
+        continue;
+      } else if (player.isAllIn) {
+        continue;
+      } else if (player.stack == 0) {
+        continue;
+      } else if(!player.actedThisRound) {
+        return false;
+      } else if (player.actedThisRound && player.hasBet == roundBet) {
+        continue;
+      } else {
+        return false;
       }
     }
     return true;

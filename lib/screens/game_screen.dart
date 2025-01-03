@@ -172,6 +172,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   bool showPlayerCards = true;
 
+  static const String cardBack = 'assets/card_back.png';
+
   void _startAnimations() {
     // Start animations for community cards
     for (int i = 0; i < _communityCardControllers.length; i++) {
@@ -459,8 +461,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                       ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
                                       : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
                                       : (game.players[2].hasFolded || (game.players[2].stack == 0 && !game.players[2].isAllIn))
-                                      ? Image.asset('assets/card_back.png', width: 50, height: 75, color: Colors.black38)
-                                      : Image.asset('assets/card_back.png', width: 50, height: 75),
+                                      ? Image.asset(cardBack, width: 50, height: 75, color: Colors.black38)
+                                      : Image.asset(cardBack, width: 50, height: 75),
                                 );
                               }).toList()
                           ),
@@ -496,8 +498,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                       ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
                                       : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
                                       : (game.players[3].hasFolded || (game.players[3].stack == 0 && !game.players[3].isAllIn))
-                                      ? Image.asset('assets/card_back.png', width: 50, height: 75, color: Colors.black38)
-                                      : Image.asset('assets/card_back.png', width: 50, height: 75),
+                                      ? Image.asset(cardBack, width: 50, height: 75, color: Colors.black38)
+                                      : Image.asset(cardBack, width: 50, height: 75),
                                 );
                               }).toList()
                           ),
@@ -534,8 +536,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                       ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
                                       : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
                                       : (game.players[4].hasFolded || (game.players[4].stack == 0 && !game.players[4].isAllIn))
-                                      ? Image.asset('assets/card_back.png', width: 50, height: 75, color: Colors.black38)
-                                      : Image.asset('assets/card_back.png', width: 50, height: 75),
+                                      ? Image.asset(cardBack, width: 50, height: 75, color: Colors.black38)
+                                      : Image.asset(cardBack, width: 50, height: 75),
                                 );
                               }).toList()
                           ),
@@ -579,8 +581,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                     ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
                                     : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
                                     : (game.players[1].hasFolded || (game.players[1].stack == 0 && !game.players[1].isAllIn))
-                                    ? Image.asset('assets/card_back.png', width: 50, height: 75, color: Colors.black38)
-                                    : Image.asset('assets/card_back.png', width: 50, height: 75),
+                                    ? Image.asset(cardBack, width: 50, height: 75, color: Colors.black38)
+                                    : Image.asset(cardBack, width: 50, height: 75),
                               );
                             }).toList()
                           ),
@@ -613,7 +615,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           if (index < revealState) {
                             cardWidget = CachedNetworkImage(imageUrl: card.image, width: 50, height: 75);
                           } else {
-                            cardWidget = const Image(image: AssetImage('assets/card_back.png'), width: 50, height: 75);
+                            cardWidget = const Image(image: AssetImage(cardBack), width: 50, height: 75);
                           }
                           return SlideTransition(
                             position: _communityCardAnimations[index],
@@ -656,8 +658,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                     ? CachedNetworkImage(imageUrl: card.image, width: 60, height: 90, color: Colors.black38)
                                     : CachedNetworkImage(imageUrl: card.image, width: 60, height: 90)
                                     : (game.players[5].hasFolded || (game.players[5].stack == 0 && !game.players[5].isAllIn))
-                                    ? Image.asset('assets/card_back.png', width: 50, height: 75, color: Colors.black38)
-                                    : Image.asset('assets/card_back.png', width: 50, height: 75),
+                                    ? Image.asset(cardBack, width: 50, height: 75, color: Colors.black38)
+                                    : Image.asset(cardBack, width: 50, height: 75),
                               );
                             }).toList()
                           ),
