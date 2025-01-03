@@ -240,8 +240,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     });
   }
 
-  int revealState = 0;
-
   void resetGame() {
     setState(() {
       for (var controller in _communityCardControllers) {controller.reset();}
@@ -267,7 +265,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
       game.shiftPositions();
       game.startGame().then((_) {
-        revealState = 0;
+        game.revealState = 0;
         _startAnimations();
       });
       takeBlinds();
@@ -314,7 +312,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       }
     }
     if (inHand.length == 1) {
-      revealState = 6;
+      game.revealState = 6;
       for (PlayerModel player in game.players) {
         game.pot += player.hasBet;
         player.hasBet = 0;
@@ -325,21 +323,21 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     }
 
     else {
-      if (game.isBettingComplete() || revealState >= 6) {
+      if (game.isBettingComplete() || game.revealState >= 6) {
         roundEnd();
-        switch (revealState) {
+        switch (game.revealState) {
           case 0: //FLOP
             for (int i = 0; i < 3; i++) {
               _communityCardControllers[i].forward();
             }
-            revealState = 3;
+            game.revealState = 3;
           case 3: //TURN
           case 4: //RIVER
-            _communityCardControllers[revealState].forward();
-            revealState++;
+            _communityCardControllers[game.revealState].forward();
+            game.revealState++;
           case 5: //REVEAL COM CARDS
             revealComCards();
-            revealState++;
+            game.revealState++;
           case 6: //SHOWDOWN
             if (inHand.length == 1) {
               inHand[0].stack += game.pot;
@@ -354,7 +352,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               }
             }
             game.pot = 0;
-            revealState++;
+            game.revealState++;
           case 7:
             resetGame(); //RESET
         }
@@ -421,11 +419,14 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   child: ElevatedButton(
                     onPressed: () {setState(() {
                         if (game.currentPlayerIndex == 0) {
-                          if (!game.players[0].hasFolded && !game.players[0].isAllIn) {
+                          if (!game.currentPlayerCannotAct()) {
                             print("Action on you");
+                          } else {
+                            nextButtonLogic();
                           }
+                        } else {
+                          nextButtonLogic();
                         }
-                        nextButtonLogic();
                     });},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white24,
@@ -630,7 +631,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           var card = entry.value;
 
                           Widget cardWidget;
-                          if (index < revealState) {
+                          if (index < game.revealState) {
                             cardWidget = CachedNetworkImage(imageUrl: card.image, width: 50, height: 75);
                           } else {
                             cardWidget = const Image(image: AssetImage(cardBack), width: 50, height: 75);
@@ -720,13 +721,14 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                               game.shiftPlayerIndex();
                               if (game.isBettingComplete()) {
                                 nextButtonLogic;
-                              }
-                              while (true) {
-                                if (game.currentPlayerCannotAct()) {
-                                  game.shiftPlayerIndex();
-                                }
-                                else {
-                                  break;
+                              } else {
+                                while (true) {
+                                  if (game.currentPlayerCannotAct()) {
+                                    game.shiftPlayerIndex();
+                                  }
+                                  else {
+                                    break;
+                                  }
                                 }
                               }
                             }
@@ -759,12 +761,13 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                               game.shiftPlayerIndex();
                               if (game.isBettingComplete()) {
                                 nextButtonLogic;
-                              }
-                              while (true) {
-                                if (game.currentPlayerCannotAct()) {
-                                  game.shiftPlayerIndex();
-                                } else {
-                                  break;
+                              } else {
+                                while (true) {
+                                  if (game.currentPlayerCannotAct()) {
+                                    game.shiftPlayerIndex();
+                                  } else {
+                                    break;
+                                  }
                                 }
                               }
                             }
@@ -792,16 +795,17 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                               print("Not your turn");
                             }
                             else {
-                              game.callLogic();
+                              game.call();
                               game.shiftPlayerIndex();
                               if (game.isBettingComplete()) {
                                 nextButtonLogic;
-                              }
-                              while (true) {
-                                if (game.currentPlayerCannotAct()) {
-                                  game.shiftPlayerIndex();
-                                } else {
-                                  break;
+                              } else {
+                                while (true) {
+                                  if (game.currentPlayerCannotAct()) {
+                                    game.shiftPlayerIndex();
+                                  } else {
+                                    break;
+                                  }
                                 }
                               }
                             }
@@ -858,12 +862,13 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                               game.shiftPlayerIndex();
                               if (game.isBettingComplete()) {
                                 nextButtonLogic;
-                              }
-                              while (true) {
-                                if (game.currentPlayerCannotAct()) {
-                                  game.shiftPlayerIndex();
-                                } else {
-                                  break;
+                              } else {
+                                while (true) {
+                                  if (game.currentPlayerCannotAct()) {
+                                    game.shiftPlayerIndex();
+                                  } else {
+                                    break;
+                                  }
                                 }
                               }
                             }
@@ -895,12 +900,13 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                               game.shiftPlayerIndex();
                               if (game.isBettingComplete()) {
                                 nextButtonLogic;
-                              }
-                              while (true) {
-                                if (game.currentPlayerCannotAct()) {
-                                  game.shiftPlayerIndex();
-                                } else {
-                                  break;
+                              } else {
+                                while (true) {
+                                  if (game.currentPlayerCannotAct()) {
+                                    game.shiftPlayerIndex();
+                                  } else {
+                                    break;
+                                  }
                                 }
                               }
                             }
@@ -932,12 +938,13 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                               game.shiftPlayerIndex();
                               if (game.isBettingComplete()) {
                                 nextButtonLogic;
-                              }
-                              while (true) {
-                                if (game.currentPlayerCannotAct()) {
-                                  game.shiftPlayerIndex();
-                                } else {
-                                  break;
+                              } else {
+                                while (true) {
+                                  if (game.currentPlayerCannotAct()) {
+                                    game.shiftPlayerIndex();
+                                  } else {
+                                    break;
+                                  }
                                 }
                               }
                             }

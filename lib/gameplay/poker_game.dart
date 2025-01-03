@@ -21,6 +21,7 @@ class PokerGame {
   int currentPlayerIndex = 0;
   int pot = 0;
   int roundBet = 0;
+  int revealState = 0;
 
   PokerGame() {
     deckService = DeckService();
@@ -179,20 +180,8 @@ class PokerGame {
     player.actedThisRound = true;
   }
 
-  Future<void> call() async{
-    int bet = roundBet;
-    PlayerModel player = players[currentPlayerIndex];
-    player.bet(bet);
-    //PRINTS AND INDICATIONS
-    print("${player.name} calls");
-    print("${player.name} current round bet: ${player.hasBet}");
-    print("${player.name} stack: ${player.stack}");
-    print("Pot: $pot");
-    player.actedThisRound = true;
-  }
-
   // Player action: Call
-  Future<void> callLogic() async{
+  Future<void> call() async{
     int bet = roundBet;
     PlayerModel player = players[currentPlayerIndex];
     if (bet == 0) {
@@ -204,7 +193,13 @@ class PokerGame {
         raiseAllIn();
       } //STACK TOO SMALL
       else {
-        call();
+        player.bet(bet);
+        //PRINTS AND INDICATIONS
+        print("${player.name} calls");
+        print("${player.name} current round bet: ${player.hasBet}");
+        print("${player.name} stack: ${player.stack}");
+        print("Pot: $pot");
+        player.actedThisRound = true;
       }
     }
   }
@@ -239,13 +234,39 @@ class PokerGame {
     player.actedThisRound = true;
   }
 
+  // Check if possible, fold otherwise
+  void checkFold() {
+    if (roundBet == 0) {
+      check();
+    } else {
+      fold();
+    }
+  }
+
+  // Check if possible, call otherwise
+  void checkCall() {
+    if (roundBet == 0) {
+      check();
+    } else {
+      call();
+    }
+  }
+
   //Initialize random number generator
-  int random(int min, int max) {
-    return min + Random().nextInt(max - min);
+  bool random(int odds) {
+    return (Random().nextInt(100) <= odds);
+  }
+
+  List<CardModel> getVisibleCommunityCards() {
+    if (revealState >= 5) {
+      return communityCards;
+    } else {
+      return communityCards.sublist(0, revealState);
+    }
   }
 
   //Computer action
-  Future<void> computerActions() async{
+  Future<void> computerActions() async {
     print("------${players[currentPlayerIndex].name} ACTION------");
 
     PlayerModel player = players[currentPlayerIndex];
@@ -254,9 +275,10 @@ class PokerGame {
     Card playerCard1 = Card.parse(hand[0].getCode());
     Card playerCard2 = Card.parse(hand[1].getCode());
 
-    String communityCardsString = communityCards.map((card) => card.getCode()).join();
-
-    int communityCardCount = communityCards.length;
+    List<CardModel> visibleCards = getVisibleCommunityCards();
+    String visibleCommunityCards = visibleCards.map((card) => card.getCode())
+        .join();
+    int communityCardCount = visibleCards.length;
     String gameState = '';
 
     if (communityCardCount == 0) {
@@ -269,54 +291,61 @@ class PokerGame {
       gameState = 'river';
     }
 
-    MadeHand playerHandStrength;
-
     if (gameState == 'pre-flop') {
-      if (playerCard1.rank == playerCard2.rank && playerCard1.rank.index > 5) {
-        raiseSmall();
-      } else if (playerCard1.rank.index >= 10 || playerCard2.rank.index >= 10) {
-        callLogic();
+      if ((playerCard1.rank == playerCard2.rank) || (playerCard1.rank.index >= 10 && playerCard2.rank.index >= 10)) {
+        if (random(50)) {
+          raiseSmall();
+        } else {
+          call();
+        }
       } else {
         fold();
       }
-    } else {
-      playerHandStrength = MadeHand.best(ImmutableCardSet.parse("$playerCard1$playerCard2$communityCardsString"));
+    }
 
-      if (gameState == 'flop' || gameState == 'turn') {
+    else {
+      String handToEvaluate = "$playerCard1$playerCard2$visibleCommunityCards";
+      MadeHand playerHandStrength = MadeHand.best(
+          ImmutableCardSet.parse(handToEvaluate));
+
+      if (gameState == 'flop') {
         if (playerHandStrength.type.index >= MadeHandType.twoPairs.index) {
           raiseBig();
         } else if (playerHandStrength.type == MadeHandType.pair) {
-          if (roundBet == 0) {
-            check();
-          } else {
-            callLogic();
-          }
+          checkCall();
         } else {
-          if (roundBet == 0) {
-            check();
-          } else {
-            fold();
-          }
+          checkFold();
         }
-      } else if (gameState == 'river') {
+      }
+
+      else if (gameState == 'turn') {
         if (playerHandStrength.type.index >= MadeHandType.straight.index) {
           raiseAllIn();
         } else if (playerHandStrength.type == MadeHandType.trips) {
           raiseBig();
         } else if (playerHandStrength.type == MadeHandType.twoPairs) {
-          if (roundBet == 0) {
-            check();
-          } else {
-            callLogic();
-          }
+          raiseSmall();
+        } else if (playerHandStrength.type == MadeHandType.pair) {
+          checkCall();
         } else {
-          if (roundBet == 0) {
-            check();
-          } else {
-            fold();
-          }
+          checkFold();
         }
       }
+
+      else if (gameState == 'river') {
+        if (playerHandStrength.type.index >= MadeHandType.straight.index) {
+          raiseAllIn();
+        } else if (playerHandStrength.type == MadeHandType.trips) {
+          raiseBig();
+        } else if (playerHandStrength.type == MadeHandType.twoPairs) {
+          raiseSmall();
+        } else if (playerHandStrength.type == MadeHandType.pair) {
+          checkCall();
+        } else {
+          checkFold();
+        }
+      }
+
     }
   }
 
