@@ -26,4 +26,16 @@ class PlayerModel {
     this.cards = const [],
     this.showCards = false,
   });
+
+  void bet(int bet) {
+    stack -= bet;
+    hasBet += bet;
+  }
+
+  void retractPreviousBet() {
+    if (actedThisRound) {
+      stack += hasBet;
+      hasBet = 0;
+    }
+  }
 }
