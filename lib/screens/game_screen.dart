@@ -223,7 +223,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   void revealComCards() {
     setState(() {
       for (var player in game.players) {
-        if (!player.isHuman) {player.showCards = true;}
+        if (!player.isHuman) {
+          player.showCards = true;
+        }
       }
     });
   }
@@ -231,7 +233,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   void hideComCards() {
     setState(() {
       for (var player in game.players) {
-        if (!player.isHuman) {player.showCards = false;}
+        if (!player.isHuman) {
+          player.showCards = false;
+        }
       }
     });
   }
@@ -253,8 +257,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         PlayerModel player = game.players[playerIndex];
         player.actedThisRound = false;
         player.isAllIn = false;
-        if (player.stack == 0) {player.hasFolded = true;}
-        else {player.hasFolded = false;}
+        if (player.stack == 0) {
+          player.hasFolded = true;
+        }
+        else {
+          player.hasFolded = false;
+        }
       }
 
       game.shiftPositions();
@@ -271,18 +279,26 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       PlayerModel player = game.players[playerIndex];
       game.pot += player.hasBet;
       player.hasBet = 0;
-      if (!player.isAllIn && !player.hasFolded) {player.actedThisRound = false;}
+      if (!player.isAllIn && !player.hasFolded) {
+        player.actedThisRound = false;
+      }
     }
     game.roundBet = 0;
     print("-------------BETTING ROUND COMPLETE-------------");
-    if (game.isBettingComplete()) {nextButtonLogic;}
+    if (game.isBettingComplete()) {
+      nextButtonLogic;
+    }
     else {
       for (int playerIndex = 0; playerIndex < 6; playerIndex++) {
         if (game.players[playerIndex].position == 1) {
           game.currentPlayerIndex = playerIndex;
           while (true) {
-            if (game.currentPlayerCannotAct()) {game.shiftPlayerIndex();}
-            else {break;}
+            if (game.currentPlayerCannotAct()) {
+              game.shiftPlayerIndex();
+            }
+            else {
+              break;
+            }
           }
         }
       }
@@ -293,7 +309,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     //CHECK IF ONLY ONE PLAYER LEFT IN HAND
     List<PlayerModel> inHand = [];
     for (PlayerModel player in game.players) {
-      if (!player.hasFolded) {inHand.add(player);}
+      if (!player.hasFolded) {
+        inHand.add(player);
+      }
     }
     if (inHand.length == 1) {
       revealState = 6;
@@ -694,14 +712,22 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                         child: ElevatedButton(
                           onPressed:(){setState((){
                             print('Fold button pressed');
-                            if (game.currentPlayerIndex != 0) {print("Not your turn");}
+                            if (game.currentPlayerIndex != 0) {
+                              print("Not your turn");
+                            }
                             else {
                               game.fold();
                               game.shiftPlayerIndex();
-                              if (game.isBettingComplete()) {nextButtonLogic;}
+                              if (game.isBettingComplete()) {
+                                nextButtonLogic;
+                              }
                               while (true) {
-                                if (game.currentPlayerCannotAct()) {game.shiftPlayerIndex();}
-                                else {break;}
+                                if (game.currentPlayerCannotAct()) {
+                                  game.shiftPlayerIndex();
+                                }
+                                else {
+                                  break;
+                                }
                               }
                             }
                           });},
@@ -724,15 +750,22 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                         child: ElevatedButton(
                           onPressed:(){setState((){
                             print('Check button pressed');
-                            if (game.currentPlayerIndex != 0) {print("Not your turn");}
-                            else if (game.roundBet != 0) {print("Cannot check");}
-                            else {
+                            if (game.currentPlayerIndex != 0) {
+                              print("Not your turn");
+                            } else if (game.roundBet != 0) {
+                              print("Cannot check");
+                            } else {
                               game.check();
                               game.shiftPlayerIndex();
-                              if (game.isBettingComplete()) {nextButtonLogic;}
+                              if (game.isBettingComplete()) {
+                                nextButtonLogic;
+                              }
                               while (true) {
-                                if (game.currentPlayerCannotAct()) {game.shiftPlayerIndex();}
-                                else {break;}
+                                if (game.currentPlayerCannotAct()) {
+                                  game.shiftPlayerIndex();
+                                } else {
+                                  break;
+                                }
                               }
                             }
                           });},
@@ -755,14 +788,21 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                         child: ElevatedButton(
                           onPressed:(){setState((){
                             print('Call button pressed');
-                            if (game.currentPlayerIndex != 0) {print("Not your turn");}
+                            if (game.currentPlayerIndex != 0) {
+                              print("Not your turn");
+                            }
                             else {
                               game.callLogic();
                               game.shiftPlayerIndex();
-                              if (game.isBettingComplete()) {nextButtonLogic;}
+                              if (game.isBettingComplete()) {
+                                nextButtonLogic;
+                              }
                               while (true) {
-                                if (game.currentPlayerCannotAct()) {game.shiftPlayerIndex();}
-                                else {break;}
+                                if (game.currentPlayerCannotAct()) {
+                                  game.shiftPlayerIndex();
+                                } else {
+                                  break;
+                                }
                               }
                             }
                           });},
@@ -810,14 +850,21 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                         child: ElevatedButton(
                           onPressed:(){setState((){
                             print('Bet small button pressed');
-                            if (game.currentPlayerIndex != 0) {print("Not your turn");}
+                            if (game.currentPlayerIndex != 0) {
+                              print("Not your turn");
+                            }
                             else {
                               game.raiseSmall();
                               game.shiftPlayerIndex();
-                              if (game.isBettingComplete()) {nextButtonLogic;}
+                              if (game.isBettingComplete()) {
+                                nextButtonLogic;
+                              }
                               while (true) {
-                                if (game.currentPlayerCannotAct()) {game.shiftPlayerIndex();}
-                                else {break;}
+                                if (game.currentPlayerCannotAct()) {
+                                  game.shiftPlayerIndex();
+                                } else {
+                                  break;
+                                }
                               }
                             }
                           });},
@@ -840,14 +887,21 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                         child: ElevatedButton(
                           onPressed:(){setState((){
                             print('Bet big button pressed');
-                            if (game.currentPlayerIndex != 0) {print("Not your turn");}
+                            if (game.currentPlayerIndex != 0) {
+                              print("Not your turn");
+                            }
                             else {
                               game.raiseBig();
                               game.shiftPlayerIndex();
-                              if (game.isBettingComplete()) {nextButtonLogic;}
+                              if (game.isBettingComplete()) {
+                                nextButtonLogic;
+                              }
                               while (true) {
-                                if (game.currentPlayerCannotAct()) {game.shiftPlayerIndex();}
-                                else {break;}
+                                if (game.currentPlayerCannotAct()) {
+                                  game.shiftPlayerIndex();
+                                } else {
+                                  break;
+                                }
                               }
                             }
                           });},
@@ -870,14 +924,21 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                         child: ElevatedButton(
                           onPressed:(){setState((){
                             print('AllIn button pressed');
-                            if (game.currentPlayerIndex != 0) {print("Not your turn");}
+                            if (game.currentPlayerIndex != 0) {
+                              print("Not your turn");
+                            }
                             else {
                               game.raiseAllIn();
                               game.shiftPlayerIndex();
-                              if (game.isBettingComplete()) {nextButtonLogic;}
+                              if (game.isBettingComplete()) {
+                                nextButtonLogic;
+                              }
                               while (true) {
-                                if (game.currentPlayerCannotAct()) {game.shiftPlayerIndex();}
-                                else {break;}
+                                if (game.currentPlayerCannotAct()) {
+                                  game.shiftPlayerIndex();
+                                } else {
+                                  break;
+                                }
                               }
                             }
                           });},

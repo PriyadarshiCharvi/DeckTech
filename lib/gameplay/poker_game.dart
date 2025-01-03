@@ -73,17 +73,25 @@ class PokerGame {
     int playerIndex = 0;
     while (playerIndex < 6) {
       if (players[playerIndex].position == 0) {
-        if (players[playerIndex].hasFolded) {players[playerIndex].position = 100;}
-        else {players[playerIndex].position = 5;}
+        if (players[playerIndex].hasFolded) {
+          players[playerIndex].position = 100;
+        }
+        else {
+          players[playerIndex].position = 5;
+        }
         break;
       }
-      else {playerIndex++;}
+      else {
+        playerIndex++;
+      }
     }
     playerIndex++;
     int position = 0;
     while (true) {
       playerIndex = playerIndex % 6;
-      if (players[playerIndex].position == 0) {break;}
+      if (players[playerIndex].position == 0) {
+        break;
+      }
       else if (!players[playerIndex].hasFolded) {
         players[playerIndex].position = position;
         playerIndex++;
@@ -101,8 +109,11 @@ class PokerGame {
     PlayerModel player = players[currentPlayerIndex];
 
     int bet;
-    if (roundBet == 0) {bet = (pot*0.33).floor();}
-    else {bet = (roundBet*2.5).floor();}
+    if (roundBet == 0) {
+      bet = (pot*0.33).floor();
+    } else {
+      bet = (roundBet*2.5).floor();
+    }
 
     player.retractPreviousBet();
     if ((bet >= player.stack)) { //STACK TOO SMALL
@@ -126,8 +137,11 @@ class PokerGame {
     PlayerModel player = players[currentPlayerIndex];
 
     int bet;
-    if (roundBet == 0) {bet = (pot*0.66).floor();}
-    else {bet = (roundBet*4.5).floor();}
+    if (roundBet == 0) {
+      bet = (pot*0.66).floor();
+    } else {
+      bet = (roundBet*4.5).floor();
+    }
 
     player.retractPreviousBet();
     if ((bet >= player.stack)) { //STACK TOO SMALL
@@ -153,7 +167,9 @@ class PokerGame {
     player.bet(bet);
     player.isAllIn = true;
 
-    if (bet > roundBet) {roundBet = bet;} // IF RAISE (NOT CALL)
+    if (bet > roundBet) {
+      roundBet = bet;
+    } // IF RAISE (NOT CALL)
 
     //PRINTS AND INDICATIONS
     print("${player.name} is all in");
@@ -179,11 +195,17 @@ class PokerGame {
   Future<void> callLogic() async{
     int bet = roundBet;
     PlayerModel player = players[currentPlayerIndex];
-    if (bet == 0) {check();}
+    if (bet == 0) {
+      check();
+    }
     else {
       player.retractPreviousBet();
-      if ((bet >= player.stack)) {raiseAllIn();} //STACK TOO SMALL
-      else {call();}
+      if ((bet >= player.stack)) {
+        raiseAllIn();
+      } //STACK TOO SMALL
+      else {
+        call();
+      }
     }
   }
 
@@ -199,7 +221,9 @@ class PokerGame {
       player.actedThisRound = true;
     } else {
       print("Cannot Check");
-      if (currentPlayerIndex != 0) {computerActions();}
+      if (currentPlayerIndex != 0) {
+        computerActions();
+      }
     }
   }
 
@@ -262,11 +286,17 @@ class PokerGame {
         if (playerHandStrength.type.index >= MadeHandType.twoPairs.index) {
           raiseBig();
         } else if (playerHandStrength.type == MadeHandType.pair) {
-          if (roundBet == 0) {check();}
-          else {callLogic();}
+          if (roundBet == 0) {
+            check();
+          } else {
+            callLogic();
+          }
         } else {
-          if (roundBet == 0) {check();}
-          else {fold();}
+          if (roundBet == 0) {
+            check();
+          } else {
+            fold();
+          }
         }
       } else if (gameState == 'river') {
         if (playerHandStrength.type.index >= MadeHandType.straight.index) {
@@ -274,11 +304,17 @@ class PokerGame {
         } else if (playerHandStrength.type == MadeHandType.trips) {
           raiseBig();
         } else if (playerHandStrength.type == MadeHandType.twoPairs) {
-          if (roundBet == 0) {check();}
-          else {callLogic();}
+          if (roundBet == 0) {
+            check();
+          } else {
+            callLogic();
+          }
         } else {
-          if (roundBet == 0) {check();}
-          else {fold();}
+          if (roundBet == 0) {
+            check();
+          } else {
+            fold();
+          }
         }
       }
     }
