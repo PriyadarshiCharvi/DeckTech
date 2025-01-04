@@ -9,6 +9,7 @@ import 'package:decktech/models/deck_model.dart';
 import 'package:decktech/models/draw_model.dart';
 import 'package:decktech/models/player_model.dart';
 import 'package:decktech/screens/deck_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'dart:math';
 
 import 'package:poker/poker.dart';
@@ -76,13 +77,11 @@ class PokerGame {
       if (players[playerIndex].position == 0) {
         if (players[playerIndex].hasFolded) {
           players[playerIndex].position = 100;
-        }
-        else {
+        } else {
           players[playerIndex].position = 5;
         }
         break;
-      }
-      else {
+      } else {
         playerIndex++;
       }
     }
@@ -92,13 +91,11 @@ class PokerGame {
       playerIndex = playerIndex % 6;
       if (players[playerIndex].position == 0) {
         break;
-      }
-      else if (!players[playerIndex].hasFolded) {
+      } else if (!players[playerIndex].hasFolded) {
         players[playerIndex].position = position;
         playerIndex++;
         position++;
-      }
-      else {
+      } else {
         players[playerIndex].position = 100;
         playerIndex++;
       }
@@ -186,13 +183,11 @@ class PokerGame {
     PlayerModel player = players[currentPlayerIndex];
     if (bet == 0) {
       check();
-    }
-    else {
+    } else {
       player.retractPreviousBet();
-      if ((bet >= player.stack)) {
+      if ((bet >= player.stack)) { //STACK TOO SMALL
         raiseAllIn();
-      } //STACK TOO SMALL
-      else {
+      } else {
         player.bet(bet);
         //PRINTS AND INDICATIONS
         print("${player.name} calls");

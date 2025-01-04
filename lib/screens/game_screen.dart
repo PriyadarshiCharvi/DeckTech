@@ -54,7 +54,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
     _communityCardAnimations = _communityCardControllers.map((controller) {
       return Tween<Offset>(
-        begin: const Offset(0, -3),
+        begin: const Offset(0, -4),
         end: Offset.zero,
       ).animate(CurvedAnimation(
         parent: controller,
@@ -257,8 +257,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         player.isAllIn = false;
         if (player.stack == 0) {
           player.hasFolded = true;
-        }
-        else {
+        } else {
           player.hasFolded = false;
         }
       }
@@ -285,16 +284,14 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     print("-------------BETTING ROUND COMPLETE-------------");
     if (game.isBettingComplete()) {
       nextButtonLogic;
-    }
-    else {
+    } else {
       for (int playerIndex = 0; playerIndex < 6; playerIndex++) {
         if (game.players[playerIndex].position == 1) {
           game.currentPlayerIndex = playerIndex;
           while (true) {
             if (game.currentPlayerCannotAct()) {
               game.shiftPlayerIndex();
-            }
-            else {
+            } else {
               break;
             }
           }
@@ -322,54 +319,51 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       resetGame();
     }
 
+    else if (game.isBettingComplete() || game.revealState >= 6) {
+      roundEnd();
+      switch (game.revealState) {
+        case 0: //FLOP
+          for (int i = 0; i < 3; i++) {
+            _communityCardControllers[i].forward();
+          }
+          game.revealState = 3;
+        case 3: //TURN
+        case 4: //RIVER
+          _communityCardControllers[game.revealState].forward();
+          game.revealState++;
+        case 5: //REVEAL COM CARDS
+          revealComCards();
+          game.revealState++;
+        case 6: //SHOWDOWN
+          if (inHand.length == 1) {
+            inHand[0].stack += game.pot;
+          } else {
+            List winners = game.getWinningPlayers(inHand);
+            if (winners.length > 1) {
+              game.splitPot(winners, inHand);
+            } else {
+              inHand[winners[0]].stack += game.pot;
+            }
+          }
+          game.pot = 0;
+          game.revealState++;
+        case 7:
+          resetGame(); //RESET
+      }
+    }
+
     else {
-      if (game.isBettingComplete() || game.revealState >= 6) {
-        roundEnd();
-        switch (game.revealState) {
-          case 0: //FLOP
-            for (int i = 0; i < 3; i++) {
-              _communityCardControllers[i].forward();
-            }
-            game.revealState = 3;
-          case 3: //TURN
-          case 4: //RIVER
-            _communityCardControllers[game.revealState].forward();
-            game.revealState++;
-          case 5: //REVEAL COM CARDS
-            revealComCards();
-            game.revealState++;
-          case 6: //SHOWDOWN
-            if (inHand.length == 1) {
-              inHand[0].stack += game.pot;
-            }
-            else {
-              List winners = game.getWinningPlayers(inHand);
-              if (winners.length > 1) {
-                game.splitPot(winners, inHand);
-              }
-              else {
-                inHand[winners[0]].stack += game.pot;
-              }
-            }
-            game.pot = 0;
-            game.revealState++;
-          case 7:
-            resetGame(); //RESET
-        }
+      if (game.currentPlayerCannotAct()) {
+        game.shiftPlayerIndex();
+        nextButtonLogic();
       } else {
-        if (game.currentPlayerCannotAct()) {
-          game.shiftPlayerIndex();
-          nextButtonLogic();
-        } else {
-          game.computerActions();
-          game.shiftPlayerIndex();
-          while (true) {
-            if (!game.isBettingComplete() && game.currentPlayerCannotAct()) {
-              game.shiftPlayerIndex();
-            }
-            else {
-              break;
-            }
+        game.computerActions();
+        game.shiftPlayerIndex();
+        while (true) {
+          if (!game.isBettingComplete() && game.currentPlayerCannotAct()) {
+            game.shiftPlayerIndex();
+          } else {
+            break;
           }
         }
       }
@@ -715,8 +709,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             print('Fold button pressed');
                             if (game.currentPlayerIndex != 0) {
                               print("Not your turn");
-                            }
-                            else {
+                            } else {
                               game.fold();
                               game.shiftPlayerIndex();
                               if (game.isBettingComplete()) {
@@ -725,8 +718,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                 while (true) {
                                   if (game.currentPlayerCannotAct()) {
                                     game.shiftPlayerIndex();
-                                  }
-                                  else {
+                                  } else {
                                     break;
                                   }
                                 }
@@ -738,10 +730,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            fixedSize: const Size(113, 50),
+                            fixedSize: const Size(109, 50),
                           ),
                           child: const Text(
-                            'FOLD', style: TextStyle(fontSize: 16,
+                            'FOLD', style: TextStyle(fontSize: 15,
                               color: Colors.red, fontWeight: FontWeight.bold)
                           ),
                         ),
@@ -777,10 +769,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            fixedSize: const Size(113, 50),
+                            fixedSize: const Size(109, 50),
                           ),
                           child: const Text(
-                              'CHECK', style: TextStyle(fontSize: 16,
+                              'CHECK', style: TextStyle(fontSize: 15,
                               color: Colors.white, fontWeight: FontWeight.bold)
                           ),
                         ),
@@ -793,8 +785,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             print('Call button pressed');
                             if (game.currentPlayerIndex != 0) {
                               print("Not your turn");
-                            }
-                            else {
+                            } else {
                               game.call();
                               game.shiftPlayerIndex();
                               if (game.isBettingComplete()) {
@@ -815,10 +806,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            fixedSize: const Size(113, 50),
+                            fixedSize: const Size(109, 50),
                           ),
                           child: const Text(
-                              'CALL', style: TextStyle(fontSize: 16,
+                              'CALL', style: TextStyle(fontSize: 15,
                               color: Colors.white, fontWeight: FontWeight.bold)
                           ),
                         ),
@@ -856,8 +847,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             print('Bet small button pressed');
                             if (game.currentPlayerIndex != 0) {
                               print("Not your turn");
-                            }
-                            else {
+                            } else {
                               game.raiseSmall();
                               game.shiftPlayerIndex();
                               if (game.isBettingComplete()) {
@@ -878,10 +868,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            fixedSize: const Size(134, 50),
+                            fixedSize: const Size(129, 50),
                           ),
                           child: const Text(
-                              'BET SMALL', style: TextStyle(fontSize: 16,
+                              'BET SMALL', style: TextStyle(fontSize: 15,
                               color: Colors.white, fontWeight: FontWeight.bold)
                           ),
                         ),
@@ -894,8 +884,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             print('Bet big button pressed');
                             if (game.currentPlayerIndex != 0) {
                               print("Not your turn");
-                            }
-                            else {
+                            } else {
                               game.raiseBig();
                               game.shiftPlayerIndex();
                               if (game.isBettingComplete()) {
@@ -916,10 +905,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            fixedSize: const Size(108, 50),
+                            fixedSize: const Size(104, 50),
                           ),
                           child: const Text(
-                              'BET BIG', style: TextStyle(fontSize: 16,
+                              'BET BIG', style: TextStyle(fontSize: 15,
                               color: Colors.white, fontWeight: FontWeight.bold)
                           ),
                         ),
@@ -932,8 +921,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             print('AllIn button pressed');
                             if (game.currentPlayerIndex != 0) {
                               print("Not your turn");
-                            }
-                            else {
+                            } else {
                               game.raiseAllIn();
                               game.shiftPlayerIndex();
                               if (game.isBettingComplete()) {
@@ -954,10 +942,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            fixedSize: const Size(97, 50),
+                            fixedSize: const Size(94, 50),
                           ),
                           child: const Text(
-                              'ALL IN', style: TextStyle(fontSize: 16,
+                              'ALL IN', style: TextStyle(fontSize: 15,
                               color: Colors.white, fontWeight: FontWeight.bold)
                           ),
                         ),
